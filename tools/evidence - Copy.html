@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bearsden Academy Evidence Viewer</title>
+    <!--
+      We now load BOTH data files.
+      1. data.js = The raw file list from OneDrive
+      2. evidencepackdata.js = The curated evidence packs from your VBA macro
+    -->
+    <script src="tools/data.js"></script>
+    <script src="tools/evidencepackdata.js"></script>
+    <style>
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; 
+            margin: 0 auto; 
+            padding: 15px; /* Reduced padding */
+            max-width: 1000px;
+            background-color: #f4f4f4; 
+            color: #333;
+            font-size: 14px; /* Reduced base font size */
+        }
+        
+        /* Header Styles */
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px; /* Reduced margin */
+            padding: 10px 0;
+            border-bottom: 2px solid #ccc;
+        }
+        .header-title {
+            text-align: center;
+            flex-grow: 1;
+            color: #333;
+            font-size: 22px; /* Reduced font size */
+            font-weight: 600;
+        }
+        .header-image {
+            height: 50px; /* Reduced height */
+            width: auto;
+        }
+        
+        /* --- Evidence Pack Section --- */
+        .pack-section {
+            margin-bottom: 20px; /* Reduced margin */
+        }
+        .pack-section h2 {
+            font-size: 1.6em; /* Reduced font size */
+            color: #005a9c;
+            border-bottom: 2px solid #005a9c;
+            padding-bottom: 8px; /* Reduced padding */
+        }
+        .pack-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); /* Tighter min */
+            gap: 15px; /* Reduced gap */
+        }
+        .pack-card {
+            display: block;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); /* Reduced shadow */
+            padding: 15px; /* Reduced padding */
+            text-decoration: none;
+            color: #333;
+            transition: all 0.2s ease;
+            border-left: 5px solid #005a9c;
+        }
+        .pack-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+        .pack-card h3 {
+            font-size: 1.2em; /* Reduced font size */
+            color: #005a9c;
+            margin-top: 0;
+            margin-bottom: 5px;
+        }
+        .pack-card p {
+            font-size: 0.9em;
+            margin: 3px 0 0 0;
+            color: #555;
+        }
+        .pack-card .pack-qi {
+            font-weight: bold;
+            font-size: 0.9em;
+            color: #008a00; /* Green for QI */
+        }
+        /* --- End of Evidence Pack Section --- */
+
+
+        /* Search and Filter Styles */
+        .search-container {
+            background-color: #fff;
+            padding: 15px; /* Reduced padding */
+            border-radius: 8px;
+            margin-bottom: 15px; /* Reduced margin */
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        .search-container h2 {
+            margin-top: 0;
+            font-size: 1.6em; /* Reduced font size */
+            color: #333;
+        }
+        .filter-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 10px; /* Reduced gap */
+        }
+        
+        .search-box {
+            display: flex;
+            gap: 10px;
+        }
+
+        #searchInput {
+            flex-grow: 1;
+            padding: 10px; /* Reduced padding */
+            font-size: 14px; /* Reduced font size */
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .control-button {
+            padding: 8px 18px; /* Reduced padding */
+            font-size: 14px; /* Reduced font size */
+            font-weight: bold;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            background-color: #d9534f; /* Red */
+            color: white;
+        }
+
+        .filter-section {
+            margin-top: 10px; /* Reduced margin */
+        }
+        .filter-section h3 {
+            margin-bottom: 8px; /* Reduced margin */
+            font-size: 1.0em; /* Reduced font size */
+            color: #555;
+            font-weight: 600;
+        }
+        .filter-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px; /* Reduced gap */
+        }
+        .filter-btn {
+            padding: 5px 12px; /* Reduced padding */
+            font-size: 12px; /* Reduced font size */
+            border: 1px solid #ccc;
+            border-radius: 20px;
+            background-color: #f8f8f8;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+        .filter-btn:hover {
+            background-color: #e9e9e9;
+        }
+        .filter-btn.active {
+            background-color: #005a9c;
+            color: white;
+            border-color: #005a9c;
+        }
+
+        /* Results Table Styles */
+        .results-container {
+            background-color: #fff;
+            padding: 15px; /* Reduced padding */
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            overflow-x: auto;
+        }
+        #resultsCount {
+            font-weight: bold;
+            color: #005a9c;
+            margin-bottom: 10px; /* Reduced margin */
+            font-size: 1.1em;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 13px; /* Reduced font size */
+        }
+        th, td {
+            padding: 8px 10px; /* Reduced padding */
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+            word-break: break-word;
+        }
+        th {
+            background-color: #f9f9f9;
+            font-weight: 600;
+            color: #333;
+        }
+        tr:hover {
+            background-color: #f4f8fb;
+        }
+        
+        /* Table column widths */
+        th:nth-child(1), td:nth-child(1) { width: 25%; } /* Name */
+        th:nth-child(2), td:nth-child(2) { width: 10%; } /* QIs */
+        th:nth-child(3), td:nth-child(3) { width: 15%; } /* Tags */
+        th:nth-child(4), td:nth-child(4) { width: 30%; } /* Description */
+        th:nth-child(5), td:nth-child(5) { width: 10%; } /* Session */
+        th:nth-child(6), td:nth-child(6) { width: 10%; } /* Status */
+
+        /* Link style */
+        td a {
+            font-weight: 600;
+            color: #005a9c;
+            text-decoration: none;
+        }
+        td a:hover {
+            text-decoration: underline;
+        }
+        
+        /* --- Table QI Label Style --- */
+        .table-qi-label {
+            display: inline-block;
+            padding: 3px 10px; /* Small padding */
+            font-size: 11px; /* Small font */
+            font-weight: bold;
+            color: #fff;
+            background-color: #005a9c; /* HGIOS Blue */
+            border-radius: 15px;
+            margin-bottom: 3px; /* Spacing if they wrap */
+            margin-right: 3px;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="header-container">
+        <img src="image/badge.png" alt="School Logo" class="header-image">
+        <div class="header-title">Bearsden Academy Evidence Library</div>
+        <img src="image/values.png" alt="Council Logo" class="header-image">
+    </header>
+
+    <!-- =================================
+         HIGH IMPACT EVIDENCE PACKS
+    ================================== -->
+    <section class="pack-section">
+        <h2>High Impact Evidence Packs</h2>
+        <div class="pack-grid" id="evidence-pack-grid">
+            <!-- Populated by JS -->
+        </div>
+    </section>
+
+    <!-- =================================
+         EVIDENCE LIBRARY SEARCH
+    ================================== -->
+    <div class="search-container">
+        <h2>Evidence Library Search</h2>
+        
+        <div class="filter-grid">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="Search by name, tag, QI, description, or status...">
+                <button id="clearButton" class="control-button">Clear</button>
+            </div>
+            
+            <div class="filter-section">
+                <h3>Filter by QI</h3>
+                <div class="filter-buttons" id="qiFilterButtons"></div>
+            </div>
+            
+            <div class="filter-section">
+                <h3>Filter by Session</h3>
+                <div class="filter-buttons" id="sessionFilterButtons"></div>
+            </div>
+            
+            <div class="filter-section">
+                <h3>Filter by Tag</h3>
+                <div class="filter-buttons" id="tagFilterButtons"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="results-container">
+        <div id="resultsCount"></div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>QIs</th>
+                    <th>Tags</th>
+                    <th>Description</th>
+                    <th>Session(s)</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody id="resultsTableBody">
+                <!-- Results will be injected here by JavaScript -->
+            </tbody>
+        </table>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // Data sources
+            const files = (typeof myFiles !== 'undefined') ? myFiles : [];
+            const packs = (typeof evidencePacks !== 'undefined') ? evidencePacks : [];
+
+            // DOM Elements
+            const searchInput = document.getElementById('searchInput');
+            const clearButton = document.getElementById('clearButton');
+            const qiFilterButtons = document.getElementById('qiFilterButtons');
+            const sessionFilterButtons = document.getElementById('sessionFilterButtons');
+            const tagFilterButtons = document.getElementById('tagFilterButtons');
+            const resultsTableBody = document.getElementById('resultsTableBody');
+            const resultsCount = document.getElementById('resultsCount');
+            const evidencePackGrid = document.getElementById('evidence-pack-grid');
+
+            // HGIOS Lookup
+            const hgiosText = { 1: "Unsatisfactory", 2: "Weak", 3: "Satisfactory", 4: "Good", 5: "Very Good", 6: "Excellent" };
+
+            // --- Load Evidence Packs ---
+            function loadEvidencePacks() {
+                if (packs.length === 0) {
+                    evidencePackGrid.innerHTML = "<p>No evidence packs found. Run the VBA macro in Excel to generate them.</p>";
+                    return;
+                }
+                
+                let packsHtml = "";
+                packs.forEach(pack => {
+                    // Make sure hgios_score is a number
+                    const score = parseInt(pack.hgios_score, 10);
+                    const scoreText = hgiosText[score] || 'N/A';
+                    
+                    packsHtml += `
+                        <a href="evidence_pack_viewer.html?index=${pack.id}" class="pack-card" target="_blank">
+                            <h3>${pack.title}</h3>
+                            <p class="pack-qi">QI: ${pack.primary_qi}</p>
+                            <p>HGIOS Score: ${score} - ${scoreText}</p>
+                        </a>
+                    `;
+                });
+                evidencePackGrid.innerHTML = packsHtml;
+            }
+
+            // --- Populate Filter Buttons ---
+            function populateFilters() {
+                const qis = new Set();
+                const tagsMap = new Map(); // Use a Map for case-insensitive grouping
+                const sessions = new Set();
+
+                files.forEach(item => {
+                    // Only add if QIs exist
+                    if (item.QIs && item.QIs.trim() !== "") {
+                        splitAndAdd(item.QIs, qis, true, ';', 'set'); // Split QIs only by semicolon
+                    }
+                    
+                    // Handle Tags (split by comma, case-insensitive)
+                    splitAndAdd(item.Tags, tagsMap, false, ',', 'map');
+                    
+                    // Handle Sessions (split by comma or semicolon AND clean hash)
+                    splitAndAdd(item.Session, sessions, true, /[;,]/, 'set');
+                });
+
+                createFilterButtons(qis, qiFilterButtons, 'qi');
+                createFilterButtons(sessions, sessionFilterButtons, 'session');
+                createFilterButtons(new Set(tagsMap.values()), tagFilterButtons, 'tag'); // Create buttons from the cased values
+            }
+
+            // --- Helper to split strings by a specific separator ---
+            function splitAndAdd(value, collection, cleanHashes, separator, collectionType) {
+                if (!value) return;
+                
+                const items = value.split(separator); // Use the provided separator
+                items.forEach(item => {
+                    let trimmedItem = item.trim();
+                    if (cleanHashes) {
+                        trimmedItem = trimmedItem.replace(/#/g, ''); // Remove all '#'
+                    }
+                    if (trimmedItem) {
+                        if (collectionType === 'map') {
+                            let lowerItem = trimmedItem.toLowerCase();
+                            if (!collection.has(lowerItem)) {
+                                collection.set(lowerItem, trimmedItem); // Store the first-seen casing
+                            }
+                        } else { // 'set'
+                            collection.add(trimmedItem);
+                        }
+                    }
+                });
+            }
+
+            // --- Helper to create button elements ---
+            function createFilterButtons(itemSet, container, filterType) {
+                let buttonsHtml = "";
+                const sortedItems = Array.from(itemSet).sort((a, b) => a.localeCompare(b, undefined, {numeric: true})); // Sort naturally
+                sortedItems.forEach(item => {
+                    buttonsHtml += `<button class="filter-btn" data-filter-type="${filterType}" data-filter-value="${item}">${item}</button>`;
+                });
+                container.innerHTML = buttonsHtml;
+                
+                // Add click listeners to all new buttons
+                container.querySelectorAll('.filter-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        btn.classList.toggle('active');
+                        performSearch();
+                    });
+                });
+            }
+            
+            // --- Get all active filters from buttons ---
+            function getActiveFilters() {
+                const activeFilters = {
+                    qi: [],
+                    session: [],
+                    tag: []
+                };
+                document.querySelectorAll('.filter-btn.active').forEach(btn => {
+                    const filterType = btn.dataset.filterType;
+                    const filterValue = btn.dataset.filterValue;
+                    if(activeFilters[filterType]) {
+                        activeFilters[filterType].push(filterValue);
+                    }
+                });
+                return activeFilters;
+            }
+
+            // --- Main Search Function ---
+            function performSearch() {
+                const searchTerm = searchInput.value.toLowerCase();
+                const activeFilters = getActiveFilters();
+                
+                let filteredFiles = files.filter(item => {
+                    // Filter out Folders
+                    if (item.ItemType && item.ItemType.toLowerCase() === 'folder') {
+                        return false;
+                    }
+
+                    // Filter out items with no QI
+                    if (!item.QIs || item.QIs.trim() === '') {
+                        return false;
+                    }
+
+                    // Text Search (includes Description and Status)
+                    const matchesSearchTerm = (
+                        (item.Name && item.Name.toLowerCase().includes(searchTerm)) ||
+                        (item.EvidenceDescription && item.EvidenceDescription.toLowerCase().includes(searchTerm)) ||
+                        (item.Status && item.Status.toLowerCase().includes(searchTerm)) ||
+                        (item.Tags && item.Tags.toLowerCase().includes(searchTerm)) ||
+                        (item.QIs && item.QIs.toLowerCase().includes(searchTerm))
+                    );
+
+                    // Filter Button Logic
+                    const matchesQIs = checkFilterMatch(item.QIs, activeFilters.qi, true, ';', 'default');
+                    const matchesSessions = checkFilterMatch(item.Session, activeFilters.session, true, /[;,]/, 'default');
+                    const matchesTags = checkFilterMatch(item.Tags, activeFilters.tag, false, ',', 'tag'); // 'tag' enables case-insensitive check
+                    
+                    return matchesSearchTerm && matchesQIs && matchesSessions && matchesTags;
+                });
+
+                displayResults(filteredFiles);
+            }
+            
+            // --- Helper to check matches (with new separator) ---
+            function checkFilterMatch(itemValue, filterArray, cleanHashes, separator, filterType = 'default') {
+                if (filterArray.length === 0) return true; // No filter selected, so it passes
+                if (!itemValue) return false; // Item has no value, but a filter is active
+                
+                let itemValues = itemValue.split(separator).map(s => s.trim());
+                
+                if (cleanHashes) {
+                    itemValues = itemValues.map(s => s.replace(/#/g, '')); // Clean hashes
+                }
+                
+                if (filterType === 'tag') {
+                    // Case-insensitive check for tags
+                    itemValues = itemValues.map(s => s.toLowerCase());
+                    const lowerCaseFilterArray = filterArray.map(f => f.toLowerCase());
+                    return lowerCaseFilterArray.some(filter => itemValues.includes(filter));
+                } else {
+                    // Standard check
+                    return filterArray.some(filter => itemValues.includes(filter));
+                }
+            }
+
+            // --- Display Results Function ---
+            function displayResults(filteredFiles) {
+                resultsTableBody.innerHTML = '';
+                resultsCount.textContent = `Found ${filteredFiles.length} matching items.`;
+
+                if (filteredFiles.length === 0) {
+                    resultsTableBody.innerHTML = '<tr><td colspan="6">No matching evidence found.</td></tr>';
+                    return;
+                }
+
+                filteredFiles.forEach(item => {
+                    
+                    // --- UPDATED: Create QI Labels ---
+                    let qiHtml = 'N/A';
+                    if (item.QIs) {
+                        const qis = item.QIs.split(';')
+                                          .map(qi => qi.replace(/#/g, '').trim())
+                                          .filter(qi => qi); // Filter out empty strings
+                        
+                        if (qis.length > 0) {
+                            qiHtml = qis.map(qi => {
+                                // **NEW:** Regex to find code at start
+                                const qiCodeMatch = qi.match(/^([0-9.]+)/); 
+                                const qiCode = qiCodeMatch ? qiCodeMatch[1] : qi; // Use code or full string as fallback
+                                // Add full text as a tooltip
+                                return `<span class="table-qi-label" title="${qi}">${qiCode}</span>`; 
+                            }).join(' ');
+                        }
+                    }
+                    
+                    // --- Clean Sessions for display ---
+                    const cleanSessions = item.Session ? item.Session.replace(/#/g, '') : 'N/A';
+                    
+                    const row = document.createElement('tr');
+                    
+                    // --- New table row structure ---
+                    row.innerHTML = `
+                        <td><a href="${item.Link}" target="_blank">${item.Name}</a></td>
+                        <td>${qiHtml}</td>
+                        <td>${item.Tags || 'N/A'}</td>
+                        <td>${item.EvidenceDescription || 'N/A'}</td>
+                        <td>${cleanSessions}</td>
+                        <td>${item.Status || 'N/A'}</td>
+                    `;
+                    resultsTableBody.appendChild(row);
+                });
+            }
+            
+            // --- Clear Filters Function ---
+            function clearFilters() {
+                searchInput.value = '';
+
+                // De-select all active buttons
+                document.querySelectorAll('.filter-btn.active').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                
+                // Re-run the search, which will now have no filters applied
+                performSearch();
+            }
+
+            // --- Event Listeners ---
+            clearButton.addEventListener('click', clearFilters);
+            searchInput.addEventListener('input', performSearch); // Reactive search
+
+            // --- Initial Page Load ---
+            loadEvidencePacks();
+            populateFilters();
+            performSearch(); // Display all items by default
+        });
+    </script>
+
+</body>
+</html>

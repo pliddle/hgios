@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bearsden Academy Evidence Viewer</title>
+    <!-- We will load the data from the separate data.js file -->
+    <script src="data.js"></script>
+    <style>
+        body { 
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif; 
+            margin: 0 auto; 
+            padding: 20px;
+            max-width: 1000px;
+            background-color: #f4f4f4; 
+            color: #333;
+        }
+        
+        /* Header Styles */
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 10px 0;
+            border-bottom: 2px solid #ccc;
+        }
+        .header-title {
+            text-align: center;
+            flex-grow: 1;
+            color: #333;
+            font-size: 24px;
+            font-weight: 600;
+        }
+        .header-image {
+            height: 60px;
+            width: auto;
+            /* Placeholder for an image if you add one */
+        }
+
+        /* Filter Section Styling */
+        .filter-controls {
+            display: flex; /* Changed from grid */
+            flex-direction: column; /* Added to stack groups vertically */
+            /* grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); */ /* Removed grid layout */
+            gap: 10px; /* Made smaller */
+            background-color: #ffffff;
+            padding: 15px; /* Made smaller */
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        .filter-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .filter-group label {
+            font-weight: 600;
+            margin-bottom: 3px; /* Made smaller */
+            font-size: 14px;
+        }
+
+        .filter-group select,
+        .filter-group input[type="text"] {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 14px;
+            width: 100%;
+            box-sizing: border-box; /* Ensures padding doesn't affect width */
+        }
+
+        /* New styles for filter buttons */
+        .filter-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px; /* Made smaller */
+            padding-top: 3px; /* Made smaller */
+        }
+
+        .filter-btn {
+            padding: 3px 8px; /* Made smaller */
+            font-size: 12px; /* Made smaller */
+            font-weight: 500;
+            border: 1px solid #ccc;
+            background-color: #f8f8f8;
+            border-radius: 12px; /* Made smaller */
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: #333;
+        }
+
+        .filter-btn:hover {
+            background-color: #eee;
+            border-color: #bbb;
+        }
+
+        .filter-btn.active {
+            background-color: #007bff;
+            color: white;
+            border-color: #007bff;
+            font-weight: 600;
+        }
+
+        /* Search input spanning */
+        .search-field {
+            /* Allows the search bar to take up more space if needed */
+            /* grid-column: 1 / -1; */ /* Removed as we are no longer using grid */
+        }
+
+        /* Button Styling */
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .button-group button {
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        #searchButton {
+            background-color: #007bff;
+            color: white;
+        }
+        #searchButton:hover {
+            background-color: #0056b3;
+        }
+
+        #clearButton {
+            background-color: #6c757d;
+            color: white;
+        }
+        #clearButton:hover {
+            background-color: #5a6268;
+        }
+
+        /* Results Area */
+        #resultsDiv {
+            margin-top: 20px;
+        }
+
+        .result-item {
+            background-color: #ffffff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+            transition: box-shadow 0.3s ease;
+        }
+        .result-item:hover {
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .result-item h3 {
+            margin-top: 0;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+        .result-item h3 a {
+            text-decoration: none;
+            color: #007bff;
+        }
+        .result-item h3 a:hover {
+            text-decoration: underline;
+        }
+
+        .result-item p {
+            margin: 5px 0;
+            font-size: 14px;
+            color: #555;
+            line-height: 1.5;
+        }
+        .result-item .meta {
+            font-size: 12px;
+            color: #777;
+            font-style: italic;
+        }
+        
+        /* New styles for Impact Score */
+        .impact-score-visual {
+            display: flex;
+            gap: 4px;
+            align-items: center;
+        }
+        .impact-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+        
+        .result-item strong {
+            color: #333;
+            font-weight: 600;
+        }
+
+        #no-results {
+            padding: 20px;
+            text-align: center;
+            font-size: 16px;
+            color: #777;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- Header -->
+    <div class="header-container">
+        <img src="image/badge.png" alt="School Logo" class="header-image" onerror="this.src='https://placehold.co/150x60/eee/ccc?text=School+Logo'">
+        <h1 class="header-title">Bearsden Academy Evidence Library</h1>
+        <!-- Second image placeholder if needed -->
+        <img src="image/values.png" alt="Council Logo" class="header-image" onerror="this.src='https://placehold.co/150x60/eee/ccc?text=Council+Logo'">
+    </div>
+
+    <!-- Filter Controls -->
+    <div class="filter-controls">
+        <div class="filter-group">
+            <label for="qiFilter">Filter by QI:</label>
+            <!-- Replaced select with a div container for buttons -->
+            <div id="qiFilterContainer" class="filter-buttons">
+                <!-- Buttons will be populated by JS -->
+            </div>
+        </div>
+        <div class="filter-group">
+            <label for="tagFilter">Filter by Tag:</label>
+            <!-- Replaced select with a div container for buttons -->
+            <div id="tagFilterContainer" class="filter-buttons">
+                <!-- Buttons will be populated by JS -->
+            </div>
+        </div>
+        <div class="filter-group">
+            <label for="sessionFilter">Filter by Session:</label>
+            <!-- Replaced select with a div container for buttons -->
+            <div id="sessionFilterContainer" class="filter-buttons">
+                <!-- Buttons will be populated by JS -->
+            </div>
+        </div>
+        <!-- New Filter Group for Impact Score -->
+        <div class="filter-group">
+            <label for="impactFilter">Filter by Impact Score:</label>
+            <div id="impactFilterContainer" class="filter-buttons">
+                <!-- Buttons will be populated by JS -->
+            </div>
+        </div>
+        <div class="filter-group search-field">
+            <label for="searchInput">Free Text Search:</label>
+            <input type="text" id="searchInput" placeholder="Search by name, description, user...">
+        </div>
+    </div>
+
+    <!-- Buttons -->
+    <div class="button-group">
+        <!-- <button id="searchButton">Search</button> --> <!-- Search button removed -->
+        <button id="clearButton">Clear Filters</button>
+    </div>
+
+    <!-- Results -->
+    <div id="resultsDiv">
+        <!-- Results will be dynamically inserted here -->
+    </div>
+
+    <script>
+        // Wait for the DOM to be fully loaded before running our script
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // Check if myFiles data exists
+            if (typeof myFiles === 'undefined') {
+                document.getElementById('resultsDiv').innerHTML = '<p style="color: red;">Error: File data (data.js) not found or loaded.</p>';
+                return;
+            }
+
+            // Get references to our DOM elements
+            // Updated to get button containers instead of select
+            const qiFilterContainer = document.getElementById('qiFilterContainer');
+            const tagFilterContainer = document.getElementById('tagFilterContainer');
+            const sessionFilterContainer = document.getElementById('sessionFilterContainer');
+            const impactFilterContainer = document.getElementById('impactFilterContainer'); // New
+            const searchInput = document.getElementById('searchInput');
+            // const searchButton = document.getElementById('searchButton'); // No longer needed
+            const clearButton = document.getElementById('clearButton');
+            const resultsDiv = document.getElementById('resultsDiv');
+
+            /**
+             * Populates the filter dropdowns with unique values from the myFiles data.
+             */
+            function populateFilters() {
+                const qiSet = new Set();
+                const tagSet = new Set();
+                const sessionSet = new Set();
+                // Impact scores are fixed, so we can define them directly
+                const impactSet = new Set(['0', '1', '2', '3', '4', '5']);
+
+                myFiles.forEach(file => {
+                    // Add non-null/empty values to the sets
+                    if (file.QIs) {
+                        // Handle potential multiple values, e.g., "QI1; QI2"
+                        // Also remove '#' to merge duplicates
+                        file.QIs.split(';').forEach(qi => {
+                            const cleanedQi = qi.trim().replace(/#/g, ''); // Remove #
+                            if (cleanedQi) qiSet.add(cleanedQi);
+                        });
+                    }
+                    if (file.Tags) {
+                         // Handle potential multiple values split by comma OR semicolon
+                         // Also remove '#' to merge duplicates
+                        file.Tags.split(/[,;]/).forEach(tag => { // Split by comma or semicolon
+                            const cleanedTag = tag.trim().replace(/#/g, ''); // Remove #
+                            if (cleanedTag) tagSet.add(cleanedTag);
+                        });
+                    }
+                    if (file.Session) {
+                        // Also remove '#' to merge duplicates
+                        const cleanedSession = file.Session.trim().replace(/#/g, ''); // Remove #
+                        if (cleanedSession) sessionSet.add(cleanedSession);
+                    }
+                    // No need to parse ImpactScore from data, as it's a fixed 0-5
+                });
+
+                // New helper function to populate a div with toggle buttons
+                const populateButtons = (containerElement, valueSet) => {
+                    // Sort numerically, but handle strings gracefully
+                    const sortedValues = [...valueSet].sort((a, b) => {
+                        const numA = parseFloat(a);
+                        const numB = parseFloat(b);
+                        if (!isNaN(numA) && !isNaN(numB)) {
+                            return numA - numB;
+                        }
+                        // Fallback for non-numeric strings (like QIs)
+                        return a.localeCompare(b); 
+                    });
+
+                    sortedValues.forEach(value => {
+                        const button = document.createElement('button');
+                        button.className = 'filter-btn';
+                        button.textContent = value;
+                        button.dataset.value = value; // Store the value in a data attribute
+                        
+                        // Add click event to toggle active state and re-run search
+                        button.addEventListener('click', () => {
+                            button.classList.toggle('active');
+                            performSearch();
+                        });
+                        
+                        containerElement.appendChild(button);
+                    });
+                };
+
+                // Populate using new button method
+                populateButtons(qiFilterContainer, qiSet);
+                populateButtons(tagFilterContainer, tagSet);
+                populateButtons(sessionFilterContainer, sessionSet);
+                populateButtons(impactFilterContainer, impactSet); // New
+            }
+
+            /**
+             * Renders the given list of file results to the page.
+             * @param {Array} files - The array of file objects to render.
+             */
+            function renderResults(files) {
+                // Clear previous results
+                resultsDiv.innerHTML = '';
+
+                if (files.length === 0) {
+                    resultsDiv.innerHTML = '<p id="no-results">No results found matching your criteria.</p>';
+                    return;
+                }
+
+                // Create and append each result item
+                files.forEach(file => {
+                    // Sanitize link (from user's original code)
+                    let link = file.Link;
+                    if (file.ItemType !== "Folder" && link) {
+                        link = link.replace(/'/g, "%27").replace(/ /g, "%20");
+                    } else if (link) {
+                        // For folders, maybe link to the parent directory
+                        // link = link.substring(0, link.lastIndexOf('/'));
+                        // Keeping the original link for folders seems more consistent
+                    } else {
+                        link = '#'; // Fallback for missing link
+                    }
+
+                    // Use nullish coalescing (??) to show 'N/A' for null/undefined fields
+                    const qis = file.QIs ?? 'N/A';
+                    const tags = file.Tags ?? 'N/A';
+                    const session = file.Session ?? 'N/A';
+                    const modifiedBy = file.ModifiedBy ?? 'N/A';
+                    const itemType = file.ItemType ?? 'N/A';
+                    const description = file.EvidenceDescription ?? 'No description available.';
+                    // *** FIX: Access with ["Impact Score"] ***
+                    const impactScore = file["Impact Score"]; // Get the new score
+                    const impactVisualHTML = createImpactVisual(impactScore); // Generate visual
+
+                    const resultItem = document.createElement('div');
+                    resultItem.className = 'result-item';
+                    resultItem.innerHTML = `
+                        <h3><a href="${link}" target="_blank">${file.Name}</a></h3>
+                        <p>${description}</p>
+                        <p><strong>Impact:</strong> ${impactVisualHTML}</p>
+                        <p>
+                            <strong>QIs:</strong> ${qis} | 
+                            <strong>Tags:</strong> ${tags} | 
+                            <strong>Session:</strong> ${session}
+                        </p>
+                        <p class="meta">
+                            <strong>Modified by:</strong> ${modifiedBy} | 
+                            <strong>Type:</strong> ${itemType}
+                        </p>
+                    `;
+                    resultsDiv.appendChild(resultItem);
+                });
+            }
+            
+            /**
+             * Creates a visual representation of the impact score (0-5)
+             * @param {number | string | null | undefined} score - The impact score.
+             * @returns {string} HTML string for the visual dots.
+             */
+            function createImpactVisual(score) {
+                // Colors from red (1) to green (5)
+                const colors = ['#ef4444', '#f97316', '#f59e0b', '#84cc16', '#16a34a'];
+                const gray = '#cbd5e1'; // Gray for un-filled or N/A
+                
+                // Parse score as a number, as it might be a string like "5"
+                const numericScore = parseInt(score, 10); 
+
+                let dotsHTML = `<div class="impact-score-visual" title="Impact: ${score ?? 'N/A'}">`;
+                
+                for (let i = 1; i <= 5; i++) {
+                    // If score is null/undefined or 0, all are gray.
+                    // Otherwise, color dots up to the score value.
+                    // Use numericScore for comparison
+                    const color = (!isNaN(numericScore) && numericScore > 0 && i <= numericScore) ? colors[i - 1] : gray;
+                    dotsHTML += `<span class="impact-dot" style="background-color: ${color};"></span>`;
+                }
+                // Add the text score for clarity
+                dotsHTML += `<span style="font-size: 12px; margin-left: 4px;">(${score ?? 'N/A'})</span>`;
+                dotsHTML += '</div>';
+                return dotsHTML;
+            }
+
+            /**
+             * Performs the search and filters the results based on all inputs.
+             */
+            function performSearch() {
+                // Get current filter values
+                // Helper to get active button values from a container
+                const getActiveFilters = (container) => {
+                    const activeButtons = container.querySelectorAll('.filter-btn.active');
+                    return Array.from(activeButtons).map(btn => btn.dataset.value);
+                };
+
+                const activeQIs = getActiveFilters(qiFilterContainer);
+                const activeTags = getActiveFilters(tagFilterContainer);
+                const activeSessions = getActiveFilters(sessionFilterContainer);
+                const activeImpactScores = getActiveFilters(impactFilterContainer); // New
+                const searchValue = searchInput.value.toLowerCase().trim();
+
+                const filteredFiles = myFiles.filter(file => {
+                    // 1. Check dropdown filters
+                    // If a value is selected, the file's property must match.
+                    
+                    // Check QIs - using .every() for "AND" logic
+                    if (activeQIs.length > 0) {
+                        // Clean the file's QIs just like we cleaned the buttons
+                        const fileQIs = (file.QIs || '').split(';').map(q => q.trim().replace(/#/g, ''));
+                        // Check if *every* active QI is included in the file's QIs
+                        if (!activeQIs.every(activeQI => fileQIs.includes(activeQI))) {
+                            return false;
+                        }
+                    }
+
+                    // Check Tags - using .every() for "AND" logic
+                    if (activeTags.length > 0) {
+                        // Clean and split the file's Tags just like we cleaned the buttons
+                        const fileTags = (file.Tags || '').split(/[,;]/).map(t => t.trim().replace(/#/g, ''));
+                        // Check if *every* active Tag is included in the file's Tags
+                        if (!activeTags.every(activeTag => fileTags.includes(activeTag))) {
+                            return false;
+                        }
+                    }
+
+                    // Check Sessions - using .includes() for "OR" logic
+                    // (An item can't be in multiple sessions, so "AND" doesn't make sense)
+                    if (activeSessions.length > 0) {
+                        // Clean the file's Session just like we cleaned the buttons
+                        const cleanedFileSession = (file.Session || '').trim().replace(/#/g, '');
+                        // Check if the file's session is *one of* the active sessions
+                        if (!activeSessions.includes(cleanedFileSession)) {
+                            return false;
+                        }
+                    }
+
+                    // Check Impact Scores - using "OR" logic
+                    if (activeImpactScores.length > 0) {
+                        // *** FIX: Access with ["Impact Score"] ***
+                        const fileScore = (file["Impact Score"] === null || file["Impact Score"] === undefined) ? null : String(file["Impact Score"]);
+                        if (!activeImpactScores.includes(fileScore)) {
+                            return false;
+                        }
+                    }
+
+                    // 2. Check free text search (if a search term is entered)
+                    if (searchValue) {
+                        const searchString = searchValue;
+                        
+                        // Check multiple fields for the search term
+                        const inName = (file.Name || "").toLowerCase().includes(searchString);
+                        const inQIs = (file.QIs || "").toLowerCase().includes(searchString);
+                        const inTags = (file.Tags || "").toLowerCase().includes(searchString);
+                        const inDescription = (file.EvidenceDescription || "").toLowerCase().includes(searchString);
+                        const inSession = (file.Session || "").toLowerCase().includes(searchString);
+                        const inModifiedBy = (file.ModifiedBy || "").toLowerCase().includes(searchString);
+                        const inItemType = (file.ItemType || "").toLowerCase().includes(searchString);
+                        // *** FIX: Access with ["Impact Score"] ***
+                        const inImpactScore = (file["Impact Score"] !== null && file["Impact Score"] !== undefined) ? String(file["Impact Score"]).includes(searchString) : false;
+
+
+                        // If none of the fields match, exclude the file
+                        if (!inName && !inQIs && !inTags && !inDescription && !inSession && !inModifiedBy && !inItemType && !inImpactScore) {
+                            return false;
+                        }
+                    }
+
+                    // If all checks passed, include the file
+                    return true;
+                });
+
+                // Render the final filtered list
+                renderResults(filteredFiles);
+            }
+
+            /**
+             * Clears all filter inputs and re-runs the search to show all results.
+             */
+            function clearFilters() {
+                // qiFilter.value = ''; // Old
+                // tagFilter.value = ''; // Old
+                // sessionFilter.value = ''; // Old
+                searchInput.value = '';
+
+                // De-select all active buttons
+                document.querySelectorAll('.filter-btn.active').forEach(btn => {
+                    btn.classList.remove('active');
+                });
+                
+                // Re-run the search, which will now have no filters applied
+                performSearch();
+            }
+
+            // --- Event Listeners ---
+            // searchButton.addEventListener('click', performSearch); // Removed
+            clearButton.addEventListener('click', clearFilters);
+            
+            // Allow pressing 'Enter' in the search box to trigger a search
+            // searchInput.addEventListener('keyup', (event) => { // Replaced with 'input'
+            //     if (event.key === 'Enter') {
+            // * performSearch(); // This was the line causing the error
+            //     }
+            // });
+
+            // Add 'input' event listener for reactive search
+            searchInput.addEventListener('input', performSearch);
+
+            // --- Initial Page Load ---
+            populateFilters();
+            // Perform an
+            // initial search to display all items by default
+            performSearch(); 
+        });
+    </script>
+
+</body>
+</html>
+
