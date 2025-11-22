@@ -44,7 +44,7 @@
 
         /* --- PRINT STYLES --- */
         @media print {
-            @page { size: landscape; margin: 1cm; }
+            @page { size: landscape; margin: 0.5cm; }
             
             /* Hide UI elements */
             header, aside, #toggle-btn, .qi-btn, button { display: none !important; }
@@ -71,11 +71,12 @@
             * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
             
             /* Canvas Sizing */
-            canvas { max-width: 100% !important; max-height: 400px !important; }
+            canvas { max-width: 100% !important; max-height: 100% !important; }
             
             /* Break Pages Nicely */
             .dash-card { break-inside: avoid; page-break-inside: avoid; border: 1px solid #ccc !important; box-shadow: none !important; }
             h2 { color: #1e3a8a !important; }
+            .print-break { break-before: page; }
         }
     </style>
 </head>
@@ -172,10 +173,11 @@
     </div>
 
     <!-- DASHBOARD OVERLAY (Full Screen Visualisation) -->
-    <div id="dashboard-view" class="hidden fixed inset-0 bg-slate-100 z-20 flex flex-col overflow-y-auto pt-20 pb-10 px-8">
+    <div id="dashboard-view" class="hidden fixed inset-0 bg-slate-100 z-20 flex flex-col overflow-y-auto pt-10 pb-10 px-8">
         
         <div class="max-w-7xl mx-auto w-full">
             
+            <!-- Dash Header -->
             <div class="flex justify-between items-end mb-8">
                 <div>
                     <h2 class="text-4xl font-bold text-slate-900 font-serif mb-2">Evaluation Dashboard</h2>
@@ -201,25 +203,46 @@
                 </div>
             </div>
 
-            <!-- Cards Grid -->
+            <!-- 1. Heatmap Cards Grid -->
             <div id="dashboard-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
                 <!-- Cards injected via JS -->
             </div>
 
-            <!-- Chart Section -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 print:break-before-auto">
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 col-span-2 print:col-span-3">
-                    <h3 class="text-lg font-bold text-slate-800 mb-4">School Profile (Radar)</h3>
-                    <div class="h-80 w-full flex justify-center relative">
+            <!-- 2. Detailed Charts Row -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+                
+                <!-- Radar Chart (QI Profile) -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 col-span-1 lg:col-span-2">
+                    <h3 class="text-lg font-bold text-slate-800 mb-4">QI Profile (Overall)</h3>
+                    <div class="h-64 w-full flex justify-center relative">
                         <canvas id="radarChart"></canvas>
                     </div>
                 </div>
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 print:col-span-3">
-                    <h3 class="text-lg font-bold text-slate-800 mb-4">Key Strengths (Level 6)</h3>
-                    <ul id="strengths-list" class="space-y-3 text-sm text-slate-600">
-                        <li class="text-slate-400 italic">Complete the rubric to see strengths...</li>
-                    </ul>
+
+                <!-- Doughnut Chart (Confidence) -->
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 col-span-1">
+                    <h3 class="text-lg font-bold text-slate-800 mb-4">Evidence Confidence</h3>
+                    <div class="h-64 w-full flex justify-center relative">
+                        <canvas id="confidenceChart"></canvas>
+                    </div>
+                    <p class="text-center text-xs text-slate-400 mt-2">Secure (Green) vs Partial (Orange) judgments</p>
                 </div>
+            </div>
+
+            <!-- 3. Theme Breakdown (Bar Chart) -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 mb-8 print:break-before-auto">
+                <h3 class="text-lg font-bold text-slate-800 mb-4">Detailed Theme Performance</h3>
+                <div class="h-80 w-full">
+                    <canvas id="themeBarChart"></canvas>
+                </div>
+            </div>
+
+            <!-- 4. Key Strengths List -->
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 print:break-inside-avoid">
+                <h3 class="text-lg font-bold text-slate-800 mb-4">Sector-Leading Strengths Identified</h3>
+                <ul id="strengths-list" class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-slate-600">
+                    <li class="text-slate-400 italic">Complete the rubric to see strengths...</li>
+                </ul>
             </div>
 
         </div>
@@ -227,6 +250,7 @@
 
     <script>
         // --- Data Structure ---
+        // (This rubricData object is populated below - kept same as before)
         const rubricData = {
             "1.3": {
                 title: "1.3 Leadership of Change",
@@ -381,9 +405,9 @@
         let userSelections = {}; 
         let userComments = {}; 
         let isDashboardOpen = false;
-        let chartInstance = null;
+        let chartInstances = {};
         const STORAGE_KEY = 'hgios_evaluation_v1';
-        const GLOBAL_DATA_VAR = 'HGIOS_SAVED_DATA'; // Variable name in default.js
+        const GLOBAL_DATA_VAR = 'HGIOS_SAVED_DATA';
 
         // --- Initialization ---
         document.addEventListener('DOMContentLoaded', () => {
@@ -392,18 +416,14 @@
         });
 
         function initData() {
-            // 1. Check for 'default.js' data (window.HGIOS_SAVED_DATA)
             if (typeof window[GLOBAL_DATA_VAR] !== 'undefined') {
                 const defaultData = window[GLOBAL_DATA_VAR];
                 if (defaultData && defaultData.selections) {
                     userSelections = defaultData.selections;
                     userComments = defaultData.comments || {};
-                    console.log("Loaded configuration from default.js");
-                    return; // Stop here, default.js overrides localStorage
+                    return;
                 }
             }
-
-            // 2. Fallback to LocalStorage
             loadFromLocal();
         }
 
@@ -427,9 +447,9 @@
             }));
         }
 
+        // --- Main Rendering Logic ---
         function loadQI(qiKey) {
-            if(isDashboardOpen) toggleDashboard(); 
-            
+            if(isDashboardOpen) toggleDashboard();
             currentQI = qiKey;
             const qiData = rubricData[qiKey];
             const container = document.getElementById('rubric-container');
@@ -498,7 +518,6 @@
 
                     const evidBtn = document.createElement('button');
                     evidBtn.className = "col-span-1 flex flex-col items-center justify-center text-slate-400 hover:text-blue-600 transition";
-                    evidBtn.title = "Add Evidence / Comments";
                     const hasComment = userComments[row.id] && userComments[row.id].trim().length > 0;
                     evidBtn.innerHTML = `<i class="fa-regular fa-comment-dots text-xl ${hasComment ? 'text-blue-600' : ''}"></i>`;
                     evidBtn.onclick = () => toggleComment(row.id);
@@ -566,7 +585,6 @@
             let total = 0;
 
             const currentRows = rubricData[currentQI].themes.flatMap(t => t.rows.map(r => r.id));
-            
             currentRows.forEach(id => {
                 if (userSelections[id]) {
                     counts[userSelections[id].level] += (userSelections[id].status === 'secure' ? 1 : 0.5);
@@ -575,7 +593,6 @@
             });
 
             const max = Math.max(1, total);
-            
             document.getElementById('bar-4').style.height = `${(counts[4] / max) * 100}%`;
             document.getElementById('bar-5').style.height = `${(counts[5] / max) * 100}%`;
             document.getElementById('bar-6').style.height = `${(counts[6] / max) * 100}%`;
@@ -590,18 +607,14 @@
             });
         }
 
-        // --- File Load/Save Logic (JavaScript Based) ---
-
+        // --- File IO ---
         function saveProfile() {
             const profileData = {
                 selections: userSelections,
                 comments: userComments,
                 timestamp: new Date().toISOString()
             };
-            
-            // Create valid JS assignment string
             const jsContent = `window.${GLOBAL_DATA_VAR} = ${JSON.stringify(profileData, null, 2)};`;
-            
             const dataStr = "data:text/javascript;charset=utf-8," + encodeURIComponent(jsContent);
             const downloadAnchorNode = document.createElement('a');
             downloadAnchorNode.setAttribute("href", dataStr);
@@ -618,30 +631,20 @@
         function handleFileUpload(input) {
             const file = input.files[0];
             if (!file) return;
-
             const reader = new FileReader();
             reader.onload = function(e) {
                 try {
                     const content = e.target.result;
                     let parsedData;
-
-                    // Logic: If it's a JS file, strip the variable declaration. If JSON, parse directly.
                     if (content.trim().startsWith("window." + GLOBAL_DATA_VAR) || content.includes(" = {")) {
-                        // Naive strip of "window.VAR = " ... ";"
-                        // Finds the first '{' and last '}'
                         const firstBrace = content.indexOf('{');
                         const lastBrace = content.lastIndexOf('}');
                         if (firstBrace !== -1 && lastBrace !== -1) {
-                            const jsonPart = content.substring(firstBrace, lastBrace + 1);
-                            parsedData = JSON.parse(jsonPart);
-                        } else {
-                            throw new Error("Could not extract object from JS file.");
-                        }
+                            parsedData = JSON.parse(content.substring(firstBrace, lastBrace + 1));
+                        } else throw new Error("JS parse error");
                     } else {
-                        // Assume standard JSON
                         parsedData = JSON.parse(content);
                     }
-
                     if(parsedData && parsedData.selections) {
                         userSelections = parsedData.selections;
                         userComments = parsedData.comments || {};
@@ -649,12 +652,10 @@
                         loadQI(currentQI);
                         if(isDashboardOpen) renderDashboard();
                         alert("Profile loaded successfully!");
-                    } else {
-                        alert("Invalid file format.");
                     }
                 } catch (err) {
                     console.error(err);
-                    alert("Error reading file. Ensure it is a valid JSON or JS profile.");
+                    alert("Error reading file.");
                 }
             };
             reader.readAsText(file);
@@ -662,7 +663,6 @@
         }
 
         // --- Dashboard Logic ---
-
         function toggleDashboard() {
             isDashboardOpen = !isDashboardOpen;
             const dash = document.getElementById('dashboard-view');
@@ -687,10 +687,18 @@
             const strengthList = document.getElementById('strengths-list');
             strengthList.innerHTML = '';
 
+            // 1. Prepare Data Containers
             let radarLabels = [];
             let radarData = [];
-            let hasData = false;
+            
+            let secureCount = 0;
+            let partialCount = 0;
 
+            let themeLabels = [];
+            let themeData = [];
+            let themeColors = [];
+
+            // 2. Loop through all QIs
             Object.keys(rubricData).forEach(qiKey => {
                 const qi = rubricData[qiKey];
                 const allRows = qi.themes.flatMap(t => t.rows);
@@ -699,29 +707,57 @@
                 let weightedSum = 0;
                 let countEvaluated = 0;
                 
+                // 2a. Sub-loop for Themes (for Bar Chart)
+                qi.themes.forEach(theme => {
+                    let themeSum = 0;
+                    let themeCount = 0;
+                    theme.rows.forEach(r => {
+                        const sel = userSelections[r.id];
+                        if(sel) {
+                            const weight = sel.status === 'secure' ? 1 : 0.6;
+                            themeSum += (sel.level * weight);
+                            themeCount += weight;
+                            
+                            // Global counts for Confidence Chart
+                            if(sel.status === 'secure') secureCount++;
+                            else partialCount++;
+
+                            // Highlight strengths
+                            if(sel.level === 6 && sel.status === 'secure') {
+                                const li = document.createElement('li');
+                                li.innerHTML = `<i class="fa-solid fa-check-circle text-purple-600 mr-2"></i> <span class="font-bold text-slate-700">${qiKey}:</span> ${r.focus}`;
+                                strengthList.appendChild(li);
+                            }
+                        }
+                    });
+                    
+                    // Theme Bar Chart Data
+                    if(themeCount > 0) {
+                        themeLabels.push(`${qiKey} ${theme.name.substring(0, 20)}...`);
+                        const themeAvg = themeSum/themeCount;
+                        themeData.push(themeAvg);
+                        themeColors.push(themeAvg >= 5.5 ? '#9333ea' : (themeAvg >= 4.5 ? '#3b82f6' : '#fbbf24'));
+                    }
+                });
+
+                // 2b. Aggregate QI Score (for Radar & Cards)
                 allRows.forEach(r => {
                     const sel = userSelections[r.id];
                     if(sel) {
-                        const weight = sel.status === 'secure' ? 1 : 0.6; 
+                        const weight = sel.status === 'secure' ? 1 : 0.6;
                         weightedSum += (sel.level * weight);
-                        countEvaluated += weight; 
-                        
-                        if(sel.level === 6 && sel.status === 'secure') {
-                            const li = document.createElement('li');
-                            li.innerHTML = `<i class="fa-solid fa-check-circle text-purple-600 mr-2"></i> <span class="font-bold text-slate-700">${qiKey}:</span> ${r.focus} (Sector Leading)`;
-                            strengthList.appendChild(li);
-                        }
+                        countEvaluated += weight;
                     }
                 });
 
                 const average = countEvaluated > 0 ? (weightedSum / countEvaluated) : 0;
                 
+                // Card Logic
                 let cardClass = "bg-level-0";
                 let statusLabel = "Not Started";
                 let scoreLabel = "0";
                 
                 if (countEvaluated > 0) {
-                    hasData = true;
                     scoreLabel = average.toFixed(1);
                     if(average >= 5.5) {
                         cardClass = "bg-level-6";
@@ -744,9 +780,7 @@
 
                 card.innerHTML = `
                     <div class="flex justify-between items-start mb-4">
-                        <div class="p-3 bg-white rounded-lg shadow-sm text-xl">
-                            <i class="fa-solid ${qi.icon}"></i>
-                        </div>
+                        <div class="p-3 bg-white rounded-lg shadow-sm text-xl"><i class="fa-solid ${qi.icon}"></i></div>
                         ${countEvaluated > 0 ? `<span class="text-2xl font-bold opacity-80">${scoreLabel}</span>` : ''}
                     </div>
                     <div>
@@ -768,20 +802,24 @@
 
             if(strengthList.innerHTML === '') strengthList.innerHTML = '<li class="text-slate-400 italic">No secure "Excellent" ratings recorded yet.</li>';
 
-            renderChart(radarLabels, radarData);
+            // 3. Render All Charts
+            renderRadar(radarLabels, radarData);
+            renderConfidence(secureCount, partialCount);
+            renderThemeBar(themeLabels, themeData, themeColors);
         }
 
-        function renderChart(labels, data) {
-            const ctx = document.getElementById('radarChart').getContext('2d');
-            
-            if(chartInstance) chartInstance.destroy();
+        // --- Chart Rendering Functions ---
 
-            chartInstance = new Chart(ctx, {
+        function renderRadar(labels, data) {
+            const ctx = document.getElementById('radarChart').getContext('2d');
+            if(chartInstances.radar) chartInstances.radar.destroy();
+
+            chartInstances.radar = new Chart(ctx, {
                 type: 'radar',
                 data: {
                     labels: labels,
                     datasets: [{
-                        label: 'Self-Evaluation Profile',
+                        label: 'Profile',
                         data: data,
                         backgroundColor: 'rgba(59, 130, 246, 0.2)',
                         borderColor: 'rgba(59, 130, 246, 1)',
@@ -800,9 +838,63 @@
                             pointLabels: { font: { size: 11 } } 
                         }
                     },
+                    plugins: { legend: { display: false } }
+                }
+            });
+        }
+
+        function renderConfidence(secure, partial) {
+            const ctx = document.getElementById('confidenceChart').getContext('2d');
+            if(chartInstances.confidence) chartInstances.confidence.destroy();
+
+            // Handle empty state
+            if(secure === 0 && partial === 0) {
+                secure = 0; partial = 1; // dummy for display
+            }
+
+            chartInstances.confidence = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Secure Evidence', 'Partial Evidence'],
+                    datasets: [{
+                        data: [secure, partial],
+                        backgroundColor: ['#22c55e', '#f97316'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    maintainAspectRatio: false,
+                    cutout: '70%',
                     plugins: {
-                        legend: { display: false }
+                        legend: { position: 'bottom', labels: { usePointStyle: true } }
                     }
+                }
+            });
+        }
+
+        function renderThemeBar(labels, data, colors) {
+            const ctx = document.getElementById('themeBarChart').getContext('2d');
+            if(chartInstances.bar) chartInstances.bar.destroy();
+
+            chartInstances.bar = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Theme Score',
+                        data: data,
+                        backgroundColor: colors,
+                        borderRadius: 4
+                    }]
+                },
+                options: {
+                    indexAxis: 'y',
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { min: 0, max: 6, grid: { color: '#f1f5f9' } },
+                        y: { grid: { display: false } }
+                    },
+                    plugins: { legend: { display: false } }
                 }
             });
         }
