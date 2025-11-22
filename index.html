@@ -10,46 +10,69 @@
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
         body { font-family: 'Inter', sans-serif; }
-        .cell-interactive {
-            transition: all 0.2s ease;
-            cursor: pointer;
-        }
-        .cell-interactive:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-        }
-        .selected-secure {
-            background-color: #dcfce7 !important; /* Green-100 */
-            border-left: 4px solid #22c55e !important;
-        }
-        .selected-partial {
-            background-color: #ffedd5 !important; /* Orange-100 */
-            border-left: 4px solid #f97316 !important;
-        }
-        .animate-pop {
-            animation: pop 0.3s ease-out;
-        }
+        
+        /* Interactive Cells */
+        .cell-interactive { transition: all 0.2s ease; cursor: pointer; }
+        .cell-interactive:hover { transform: translateY(-2px); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+        .selected-secure { background-color: #dcfce7 !important; border-left: 4px solid #22c55e !important; }
+        .selected-partial { background-color: #ffedd5 !important; border-left: 4px solid #f97316 !important; }
+        
+        .animate-pop { animation: pop 0.3s ease-out; }
         @keyframes pop {
             0% { transform: scale(0.95); }
             50% { transform: scale(1.02); }
             100% { transform: scale(1); }
         }
         
-        /* Dashboard Specific Styles */
-        .dash-card {
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        .dash-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-        }
+        /* Dashboard Styles */
+        .dash-card { transition: transform 0.3s ease, box-shadow 0.3s ease; }
+        .dash-card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); }
         .bg-level-4 { background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%); border-color: #fbbf24; color: #92400e; }
         .bg-level-5 { background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%); border-color: #3b82f6; color: #1e40af; }
         .bg-level-6 { background: linear-gradient(135deg, #faf5ff 0%, #f3e8ff 100%); border-color: #a855f7; color: #6b21a8; }
         .bg-level-0 { background: #f8fafc; border-color: #e2e8f0; color: #64748b; }
+
+        /* --- PRINT STYLES --- */
+        @media print {
+            @page { size: landscape; margin: 1cm; }
+            
+            /* Hide UI elements */
+            header, aside, #toggle-btn, .qi-btn, button { display: none !important; }
+            
+            /* Reset Layout Constraints */
+            body, html, #edit-view, #rubric-container, #dashboard-view {
+                height: auto !important;
+                overflow: visible !important;
+                position: static !important;
+                background: white !important;
+            }
+
+            /* Logic for printing Dashboard vs Edit View */
+            body.printing-dashboard #edit-view { display: none !important; }
+            body.printing-dashboard #dashboard-view { 
+                display: block !important; 
+                position: relative !important; 
+                inset: auto !important; 
+                padding: 0 !important;
+                background: white !important;
+            }
+
+            /* Ensure Background Colors Print */
+            * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+            
+            /* Canvas Sizing */
+            canvas { max-width: 100% !important; max-height: 400px !important; }
+            
+            /* Break Pages Nicely */
+            .dash-card { break-inside: avoid; page-break-inside: avoid; border: 1px solid #ccc !important; box-shadow: none !important; }
+            h2 { color: #1e3a8a !important; }
+        }
     </style>
 </head>
 <body class="bg-slate-50 text-slate-800 h-screen flex flex-col overflow-hidden">
+
+    <!-- Hidden Input for Loading Files -->
+    <input type="file" id="file-upload" class="hidden" accept=".json" onchange="handleFileUpload(this)">
 
     <!-- Header -->
     <header class="bg-blue-900 text-white p-4 shadow-lg shrink-0 z-30 relative">
@@ -58,8 +81,17 @@
                 <h1 class="text-2xl font-bold tracking-tight">HGIOS 4 Evaluation Toolkit</h1>
                 <p class="text-blue-200 text-sm">Secondary School Framework (Sector-Leading Benchmarks)</p>
             </div>
-            <div class="flex space-x-4">
-                <button onclick="resetAll()" class="px-4 py-2 bg-blue-800 hover:bg-blue-700 rounded text-sm font-medium transition"><i class="fa-solid fa-rotate-right mr-2"></i>Reset</button>
+            <div class="flex space-x-3">
+                <button onclick="saveProfile()" class="px-3 py-2 bg-blue-800 hover:bg-blue-700 rounded text-sm font-medium transition border border-blue-700" title="Save as JSON file">
+                    <i class="fa-solid fa-download mr-2"></i>Save
+                </button>
+                <button onclick="triggerLoad()" class="px-3 py-2 bg-blue-800 hover:bg-blue-700 rounded text-sm font-medium transition border border-blue-700" title="Load JSON file">
+                    <i class="fa-solid fa-upload mr-2"></i>Load
+                </button>
+                <div class="w-px h-8 bg-blue-700 mx-1"></div>
+                <button onclick="resetAll()" class="px-3 py-2 bg-blue-800 hover:bg-blue-700 rounded text-sm font-medium transition" title="Clear all data">
+                    <i class="fa-solid fa-rotate-right"></i>
+                </button>
                 <button onclick="toggleDashboard()" id="toggle-btn" class="px-4 py-2 bg-white text-blue-900 hover:bg-blue-50 rounded text-sm font-bold shadow transition flex items-center">
                     <i class="fa-solid fa-chart-pie mr-2"></i> Visualise Dashboard
                 </button>
@@ -71,7 +103,7 @@
     <div id="edit-view" class="flex flex-1 overflow-hidden transition-opacity duration-300 opacity-100">
         
         <!-- Sidebar: QI Selector -->
-        <aside class="w-64 bg-white border-r border-slate-200 overflow-y-auto shrink-0 z-10">
+        <aside class="w-64 bg-white border-r border-slate-200 overflow-y-auto shrink-0 z-10 print:hidden">
             <nav class="p-4 space-y-2">
                 <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Leadership & Management</div>
                 <button onclick="loadQI('1.3')" id="nav-1.3" class="qi-btn w-full text-left px-4 py-3 rounded-lg hover:bg-slate-100 focus:outline-none transition flex justify-between items-center group">
@@ -139,15 +171,22 @@
                     <h2 class="text-4xl font-bold text-slate-900 font-serif mb-2">Evaluation Dashboard</h2>
                     <p class="text-slate-500 text-lg">Real-time analysis against Sector-Leading Benchmarks</p>
                 </div>
-                <div class="flex gap-2">
-                    <div class="flex items-center gap-2 px-3 py-1 rounded-full bg-amber-100 text-amber-800 text-xs font-bold uppercase">
-                        <div class="w-3 h-3 bg-amber-400 rounded-full"></div> Good (L4)
+                <div class="flex gap-4">
+                    <div class="flex gap-2 print:hidden">
+                        <button onclick="window.print()" class="px-4 py-2 bg-slate-800 text-white rounded-lg hover:bg-slate-700 shadow-md transition">
+                            <i class="fa-solid fa-print mr-2"></i> Print Dashboard
+                        </button>
                     </div>
-                    <div class="flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100 text-blue-800 text-xs font-bold uppercase">
-                        <div class="w-3 h-3 bg-blue-500 rounded-full"></div> Very Good (L5)
-                    </div>
-                    <div class="flex items-center gap-2 px-3 py-1 rounded-full bg-purple-100 text-purple-800 text-xs font-bold uppercase">
-                        <div class="w-3 h-3 bg-purple-600 rounded-full"></div> Excellent (L6)
+                    <div class="flex gap-2">
+                        <div class="flex items-center gap-2 px-3 py-1 rounded-full bg-amber-100 text-amber-800 text-xs font-bold uppercase">
+                            <div class="w-3 h-3 bg-amber-400 rounded-full"></div> Good (L4)
+                        </div>
+                        <div class="flex items-center gap-2 px-3 py-1 rounded-full bg-blue-100 text-blue-800 text-xs font-bold uppercase">
+                            <div class="w-3 h-3 bg-blue-500 rounded-full"></div> Very Good (L5)
+                        </div>
+                        <div class="flex items-center gap-2 px-3 py-1 rounded-full bg-purple-100 text-purple-800 text-xs font-bold uppercase">
+                            <div class="w-3 h-3 bg-purple-600 rounded-full"></div> Excellent (L6)
+                        </div>
                     </div>
                 </div>
             </div>
@@ -158,15 +197,15 @@
             </div>
 
             <!-- Chart Section -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 col-span-2">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 print:break-before-auto">
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 col-span-2 print:col-span-3">
                     <h3 class="text-lg font-bold text-slate-800 mb-4">School Profile (Radar)</h3>
-                    <div class="h-64">
+                    <div class="h-64 w-full flex justify-center">
                         <canvas id="radarChart"></canvas>
                     </div>
                 </div>
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200">
-                    <h3 class="text-lg font-bold text-slate-800 mb-4">Key Strengths</h3>
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 print:col-span-3">
+                    <h3 class="text-lg font-bold text-slate-800 mb-4">Key Strengths (Level 6)</h3>
                     <ul id="strengths-list" class="space-y-3 text-sm text-slate-600">
                         <li class="text-slate-400 italic">Complete the rubric to see strengths...</li>
                     </ul>
@@ -329,8 +368,8 @@
 
         // --- State Management ---
         let currentQI = '2.3';
-        let userSelections = {}; // { "1.3.1.1": { level: 5, status: 'secure' } }
-        let userComments = {}; // { "1.3.1.1": "Comment text" }
+        let userSelections = {}; 
+        let userComments = {}; 
         let isDashboardOpen = false;
         let chartInstance = null;
         const STORAGE_KEY = 'hgios_evaluation_v1';
@@ -362,14 +401,13 @@
         }
 
         function loadQI(qiKey) {
-            if(isDashboardOpen) toggleDashboard(); // Close dash if navigating
+            if(isDashboardOpen) toggleDashboard(); 
             
             currentQI = qiKey;
             const qiData = rubricData[qiKey];
             const container = document.getElementById('rubric-container');
             const title = document.getElementById('current-qi-title');
 
-            // Update Navigation Active State
             document.querySelectorAll('.qi-btn').forEach(btn => {
                 btn.classList.remove('bg-blue-50', 'border-r-4', 'border-blue-500');
                 btn.classList.add('hover:bg-slate-100');
@@ -383,7 +421,6 @@
             title.innerText = qiData.title;
             container.innerHTML = '';
 
-            // Build Themes
             qiData.themes.forEach((theme, themeIndex) => {
                 const themeSection = document.createElement('div');
                 themeSection.className = "mb-12";
@@ -393,11 +430,9 @@
                 themeTitle.innerText = `Theme ${themeIndex + 1}: ${theme.name}`;
                 themeSection.appendChild(themeTitle);
 
-                // Build Table
                 const table = document.createElement('div');
                 table.className = "grid gap-6";
 
-                // Headers
                 const header = document.createElement('div');
                 header.className = "grid grid-cols-12 gap-4 text-sm font-bold text-slate-500 uppercase tracking-wider mb-2 px-4";
                 header.innerHTML = `
@@ -413,19 +448,16 @@
                     const rowEl = document.createElement('div');
                     rowEl.className = "bg-white rounded-lg shadow-sm border border-slate-200 p-4 grid grid-cols-12 gap-4 items-stretch";
 
-                    // Focus Area Label
                     const label = document.createElement('div');
                     label.className = "col-span-2 flex items-center font-semibold text-slate-700 text-sm pr-2 border-r border-slate-100";
                     label.innerText = row.focus;
                     rowEl.appendChild(label);
 
-                    // Level Cells
                     [4, 5, 6].forEach(level => {
                         const cell = document.createElement('div');
                         cell.className = `col-span-3 p-3 rounded bg-slate-50 text-sm text-slate-600 leading-relaxed cell-interactive hover:bg-white border border-transparent hover:border-blue-200 select-none transition-all`;
                         cell.id = `cell-${row.id}-${level}`;
                         
-                        // Check existing state
                         const selection = userSelections[row.id];
                         if (selection && selection.level === level) {
                             if (selection.status === 'secure') cell.classList.add('selected-secure', 'text-green-900');
@@ -437,7 +469,6 @@
                         rowEl.appendChild(cell);
                     });
 
-                    // Evidence Button
                     const evidBtn = document.createElement('button');
                     evidBtn.className = "col-span-1 flex flex-col items-center justify-center text-slate-400 hover:text-blue-600 transition";
                     evidBtn.title = "Add Evidence / Comments";
@@ -446,7 +477,6 @@
                     evidBtn.onclick = () => toggleComment(row.id);
                     rowEl.appendChild(evidBtn);
 
-                    // Comment Box (Hidden by default)
                     const commentBox = document.createElement('div');
                     commentBox.id = `comment-${row.id}`;
                     commentBox.className = `col-span-12 mt-2 ${hasComment ? '' : 'hidden'}`;
@@ -469,7 +499,6 @@
         function toggleSelection(rowId, level, element) {
             const current = userSelections[rowId];
             
-            // Reset all cells in this row visually
             [4, 5, 6].forEach(l => {
                 const el = document.getElementById(`cell-${rowId}-${l}`);
                 if (el) el.className = el.className.replace(/selected-secure|selected-partial|text-green-900|text-orange-900/g, '').trim();
@@ -477,15 +506,12 @@
 
             if (current && current.level === level) {
                 if (current.status === 'secure') {
-                    // Toggle to partial
                     userSelections[rowId] = { level: level, status: 'partial' };
                     element.classList.add('selected-partial', 'text-orange-900', 'animate-pop');
                 } else {
-                    // Toggle off
                     delete userSelections[rowId];
                 }
             } else {
-                // New selection
                 userSelections[rowId] = { level: level, status: 'secure' };
                 element.classList.add('selected-secure', 'text-green-900', 'animate-pop');
             }
@@ -509,7 +535,6 @@
         }
 
         function updateStats() {
-            // Calculate stats for CURRENT QI active in editor
             let counts = { 4: 0, 5: 0, 6: 0 };
             let total = 0;
 
@@ -528,7 +553,6 @@
             document.getElementById('bar-5').style.height = `${(counts[5] / max) * 100}%`;
             document.getElementById('bar-6').style.height = `${(counts[6] / max) * 100}%`;
 
-            // Update Nav Dots
             Object.keys(rubricData).forEach(qi => {
                 const rows = rubricData[qi].themes.flatMap(t => t.rows.map(r => r.id));
                 const hasSelection = rows.some(id => userSelections[id]);
@@ -539,20 +563,73 @@
             });
         }
 
+        // --- File Load/Save Logic ---
+
+        function saveProfile() {
+            const profileData = {
+                selections: userSelections,
+                comments: userComments,
+                timestamp: new Date().toISOString()
+            };
+            
+            const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(profileData));
+            const downloadAnchorNode = document.createElement('a');
+            downloadAnchorNode.setAttribute("href", dataStr);
+            downloadAnchorNode.setAttribute("download", "hgios_profile_" + new Date().toISOString().slice(0,10) + ".json");
+            document.body.appendChild(downloadAnchorNode); // required for firefox
+            downloadAnchorNode.click();
+            downloadAnchorNode.remove();
+        }
+
+        function triggerLoad() {
+            document.getElementById('file-upload').click();
+        }
+
+        function handleFileUpload(input) {
+            const file = input.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const parsed = JSON.parse(e.target.result);
+                    if(parsed.selections) {
+                        userSelections = parsed.selections;
+                        userComments = parsed.comments || {};
+                        saveToLocal(); // persist imported data
+                        loadQI(currentQI);
+                        if(isDashboardOpen) renderDashboard();
+                        alert("Profile loaded successfully!");
+                    } else {
+                        alert("Invalid file format.");
+                    }
+                } catch (err) {
+                    console.error(err);
+                    alert("Error reading file.");
+                }
+            };
+            reader.readAsText(file);
+            // Reset input so same file can be selected again if needed
+            input.value = '';
+        }
+
         // --- Dashboard Logic ---
 
         function toggleDashboard() {
             isDashboardOpen = !isDashboardOpen;
             const dash = document.getElementById('dashboard-view');
             const btn = document.getElementById('toggle-btn');
+            const body = document.body;
             
             if(isDashboardOpen) {
                 dash.classList.remove('hidden');
                 btn.innerHTML = '<i class="fa-solid fa-pen-to-square mr-2"></i> Back to Assessment';
+                body.classList.add('printing-dashboard');
                 renderDashboard();
             } else {
                 dash.classList.add('hidden');
                 btn.innerHTML = '<i class="fa-solid fa-chart-pie mr-2"></i> Visualise Dashboard';
+                body.classList.remove('printing-dashboard');
             }
         }
 
@@ -566,7 +643,6 @@
             let radarData = [];
             let hasData = false;
 
-            // Calculate Stats for each QI
             Object.keys(rubricData).forEach(qiKey => {
                 const qi = rubricData[qiKey];
                 const allRows = qi.themes.flatMap(t => t.rows);
@@ -578,12 +654,10 @@
                 allRows.forEach(r => {
                     const sel = userSelections[r.id];
                     if(sel) {
-                        // Secure = 1.0 weight, Partial = 0.6 weight
                         const weight = sel.status === 'secure' ? 1 : 0.6; 
                         weightedSum += (sel.level * weight);
                         countEvaluated += weight; 
                         
-                        // Collect Strength for list
                         if(sel.level === 6 && sel.status === 'secure') {
                             const li = document.createElement('li');
                             li.innerHTML = `<i class="fa-solid fa-check-circle text-purple-600 mr-2"></i> <span class="font-bold text-slate-700">${qiKey}:</span> ${r.focus} (Sector Leading)`;
@@ -594,7 +668,6 @@
 
                 const average = countEvaluated > 0 ? (weightedSum / countEvaluated) : 0;
                 
-                // Determine Status Card
                 let cardClass = "bg-level-0";
                 let statusLabel = "Not Started";
                 let scoreLabel = "0";
@@ -616,10 +689,9 @@
                     }
                 }
 
-                // Create Card
                 const card = document.createElement('div');
                 card.className = `dash-card rounded-xl p-6 border-2 flex flex-col justify-between min-h-[180px] ${cardClass}`;
-                card.onclick = () => { toggleDashboard(); loadQI(qiKey); }; // Click to edit
+                card.onclick = () => { toggleDashboard(); loadQI(qiKey); }; 
                 card.style.cursor = "pointer";
 
                 card.innerHTML = `
@@ -642,7 +714,6 @@
                 `;
                 grid.appendChild(card);
 
-                // Chart Data
                 radarLabels.push(qiKey);
                 radarData.push(average);
             });
