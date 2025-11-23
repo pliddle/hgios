@@ -536,7 +536,10 @@
                         rowEl.appendChild(cell);
                     });
 
+                    // Generate UNIQUE ID for button
+                    const btnId = `btn-evid-${row.id.replace(/\./g, '-')}`; // e.g. btn-evid-2-3-1-1
                     const evidBtn = document.createElement('button');
+                    evidBtn.id = btnId;
                     evidBtn.className = "col-span-1 flex flex-col items-center justify-center text-slate-400 hover:text-blue-600 transition";
                     
                     // Check if we have evidence array
@@ -633,6 +636,7 @@
             const packIndex = parseInt(packIndexStr);
             if (isNaN(packIndex)) return;
 
+            if (!userEvidenceLinks) userEvidenceLinks = {}; // Safety init
             if (!userEvidenceLinks[rowId]) {
                 userEvidenceLinks[rowId] = [];
             }
@@ -643,14 +647,18 @@
                 saveToLocal();
                 renderEvidenceTags(rowId);
                 
-                // Update icon color immediately
-                const btnIcon = document.querySelector(`#evidence-${rowId}`).previousSibling.querySelector('i');
-                if(btnIcon) btnIcon.classList.add('text-blue-600');
+                // Update icon color immediately using robust ID selector
+                const btnId = `btn-evid-${rowId.replace(/\./g, '-')}`;
+                const btn = document.getElementById(btnId);
+                if (btn) {
+                    const icon = btn.querySelector('i');
+                    if(icon) icon.classList.add('text-blue-600');
+                }
             }
         }
 
         function removeEvidence(rowId, packIndex) {
-            if (!userEvidenceLinks[rowId]) return;
+            if (!userEvidenceLinks || !userEvidenceLinks[rowId]) return;
             
             userEvidenceLinks[rowId] = userEvidenceLinks[rowId].filter(idx => idx !== packIndex);
             saveToLocal();
@@ -658,8 +666,12 @@
 
             // If empty, maybe uncolor icon?
             if (userEvidenceLinks[rowId].length === 0) {
-                const btnIcon = document.querySelector(`#evidence-${rowId}`).previousSibling.querySelector('i');
-                if(btnIcon) btnIcon.classList.remove('text-blue-600');
+                const btnId = `btn-evid-${rowId.replace(/\./g, '-')}`;
+                const btn = document.getElementById(btnId);
+                if (btn) {
+                    const icon = btn.querySelector('i');
+                    if(icon) icon.classList.remove('text-blue-600');
+                }
             }
         }
 
