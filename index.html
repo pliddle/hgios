@@ -12,12 +12,10 @@
       AUTO-LOAD MECHANISMS:
       1. default.js: Loads saved profile/ratings.
       2. evidencepackdata.js: Loads the array of evidence packs.
-         This expects a file that defines 'const evidencePacks = [...]'
-         Note: If using local file:// protocol, ensure your browser allows local file access 
-         or serve this folder via a simple local server (e.g. python -m http.server).
+         Note: Uses GitHub URL. If running locally without internet, ensure this file exists locally.
     -->
     <script src="default.js"></script>
-    <script src="evidencepackdata.js"></script>
+    <script src="https://pliddle.github.io/hgios/tools/evidencepackdata.js"></script>
 
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
@@ -178,10 +176,11 @@
         </main>
     </div>
 
-    <!-- DASHBOARD OVERLAY -->
+    <!-- DASHBOARD OVERLAY (Full Screen Visualisation) -->
     <div id="dashboard-view" class="hidden fixed inset-0 bg-slate-100 z-20 flex flex-col overflow-y-auto pt-10 pb-10 px-8">
+        
         <div class="max-w-7xl mx-auto w-full">
-            <!-- Dash Header -->
+            
             <div class="flex justify-between items-end mb-8">
                 <div>
                     <h2 class="text-4xl font-bold text-slate-900 font-serif mb-2">Evaluation Dashboard</h2>
@@ -207,34 +206,33 @@
                 </div>
             </div>
 
-            <!-- Grid -->
-            <div id="dashboard-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8"></div>
-
-            <!-- Charts -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 col-span-1 lg:col-span-2">
-                    <h3 class="text-lg font-bold text-slate-800 mb-4">QI Profile (Overall)</h3>
-                    <div class="h-64 w-full flex justify-center relative"><canvas id="radarChart"></canvas></div>
-                </div>
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 col-span-1">
-                    <h3 class="text-lg font-bold text-slate-800 mb-4">Evidence Confidence</h3>
-                    <div class="h-64 w-full flex justify-center relative"><canvas id="confidenceChart"></canvas></div>
-                </div>
+            <!-- Cards Grid -->
+            <div id="dashboard-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+                <!-- Cards injected via JS -->
             </div>
 
+            <!-- Chart Section -->
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 print:break-before-auto">
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 col-span-2 print:col-span-3">
+                    <h3 class="text-lg font-bold text-slate-800 mb-4">School Profile (Radar)</h3>
+                    <div class="h-80 w-full flex justify-center relative">
+                        <canvas id="radarChart"></canvas>
+                    </div>
+                </div>
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 print:col-span-3">
+                    <h3 class="text-lg font-bold text-slate-800 mb-4">Key Strengths (Level 6)</h3>
+                    <ul id="strengths-list" class="space-y-3 text-sm text-slate-600">
+                        <li class="text-slate-400 italic">Complete the rubric to see strengths...</li>
+                    </ul>
+                </div>
+            </div>
+            
             <!-- Theme Bar -->
-            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 mb-8 print:break-before-auto">
+            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 mb-8 print:break-before-auto mt-6">
                 <h3 class="text-lg font-bold text-slate-800 mb-4">Detailed Theme Performance</h3>
                 <div class="h-80 w-full"><canvas id="themeBarChart"></canvas></div>
             </div>
 
-            <!-- Strengths -->
-            <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 print:break-inside-avoid">
-                <h3 class="text-lg font-bold text-slate-800 mb-4">Sector-Leading Strengths Identified</h3>
-                <ul id="strengths-list" class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm text-slate-600">
-                    <li class="text-slate-400 italic">Complete the rubric to see strengths...</li>
-                </ul>
-            </div>
         </div>
     </div>
 
@@ -404,25 +402,28 @@
             
             // Delay looking for window.evidencePacks to allow external script to run
             setTimeout(() => {
-                if (typeof window.evidencePacks !== 'undefined' && Array.isArray(window.evidencePacks)) {
-                    window.EVIDENCE_PACKS = window.evidencePacks;
-                } else if (typeof window.EVIDENCE_PACKS === 'undefined' && typeof window.evidence_packs !== 'undefined') {
-                    // Try alternate variable name
-                    window.EVIDENCE_PACKS = window.evidence_packs;
-                } else if (typeof window.EVIDENCE_PACKS === 'undefined') {
-                    // Fallback if file didn't load or variable name differs
+                // Try to find variable 'evidencePacks' in global scope.
+                // 'const' does not attach to 'window', so we must check via a try-catch block for the identifier
+                let packs = [];
+                try {
+                    if (typeof evidencePacks !== 'undefined') {
+                        packs = evidencePacks;
+                    } else if (typeof window.evidencePacks !== 'undefined') {
+                        packs = window.evidencePacks;
+                    }
+                } catch (e) {
+                    // ReferenceError if not defined
+                }
+
+                if (Array.isArray(packs) && packs.length > 0) {
+                    window.EVIDENCE_PACKS = packs;
+                } else {
                     console.warn("Evidence packs file not loaded or variable name mismatch. Using fallback.");
+                    // Fallback mock data
                     window.EVIDENCE_PACKS = [
-                        "S1-S3 Tracking Data (Nov 2024)",
-                        "Senior Phase Insight Analysis",
-                        "Pupil Focus Groups: Wellbeing",
-                        "Staff Survey Results 2025",
-                        "Lesson Observation Records",
-                        "Department Minutes (Maths)",
-                        "Parent Council Feedback",
-                        "Attendance Statistics",
-                        "Destinations Report 23/24",
-                        "Quality Assurance Calendar"
+                        { id: 0, title: "Mock: S1-S3 Tracking Data" },
+                        { id: 1, title: "Mock: Senior Phase Insight Analysis" },
+                        { id: 2, title: "Mock: Pupil Focus Groups" }
                     ];
                 }
                 
@@ -546,11 +547,14 @@
                     evidenceContainer.id = `evidence-${row.id}`;
                     evidenceContainer.className = `col-span-12 mt-2 p-3 bg-slate-50 border rounded-lg ${hasEvidence ? '' : 'hidden'} evidence-selector-dropdown`;
                     
-                    // Dropdown
+                    // Dropdown Logic with Object Handling
                     let optionsHtml = `<option disabled selected>+ Add Evidence Pack...</option>`;
                     if (window.EVIDENCE_PACKS) {
                         window.EVIDENCE_PACKS.forEach((pack, idx) => {
-                            optionsHtml += `<option value="${idx}">${pack}</option>`;
+                            // Check if pack is object or string
+                            let packTitle = (typeof pack === 'object' && pack.title) ? pack.title : pack;
+                            let packValue = (typeof pack === 'object' && typeof pack.id !== 'undefined') ? pack.id : idx;
+                            optionsHtml += `<option value="${packValue}">${packTitle}</option>`;
                         });
                     }
 
@@ -663,12 +667,26 @@
             const indices = userEvidenceLinks[rowId] || [];
 
             indices.forEach(idx => {
-                const packName = (window.EVIDENCE_PACKS && window.EVIDENCE_PACKS[idx]) || "Unknown Pack";
+                // Find pack in window.EVIDENCE_PACKS (handling objects vs strings)
+                let pack = null;
+                if (window.EVIDENCE_PACKS) {
+                    // Check if packs have IDs (object structure) or are just strings
+                    const isObjectArray = typeof window.EVIDENCE_PACKS[0] === 'object';
+                    if (isObjectArray) {
+                        pack = window.EVIDENCE_PACKS.find(p => p.id === idx);
+                    } else {
+                        pack = window.EVIDENCE_PACKS[idx];
+                    }
+                }
+                
+                const packName = (pack && (pack.title || pack)) || "Unknown Pack";
+                const packId = (pack && typeof pack.id !== 'undefined') ? pack.id : idx;
+
                 const tag = document.createElement('span');
                 tag.className = "evidence-tag inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800 border border-blue-200";
                 tag.innerHTML = `
-                    <a href="evidence_pack_viewer.html?index=${idx}" target="_blank" class="hover:underline font-semibold" title="Open Evidence Pack">${packName}</a>
-                    <button onclick="removeEvidence('${rowId}', ${idx})" class="ml-2 text-blue-400 hover:text-red-600 font-bold">×</button>
+                    <a href="evidence_pack_viewer.html?index=${packId}" target="_blank" class="hover:underline font-semibold" title="Open Evidence Pack">${packName}</a>
+                    <button onclick="removeEvidence('${rowId}', ${packId})" class="ml-2 text-blue-400 hover:text-red-600 font-bold">×</button>
                 `;
                 container.appendChild(tag);
             });
