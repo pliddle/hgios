@@ -52,52 +52,99 @@
             margin-bottom: 30px; 
         }
         .pack-section h2 {
-            font-size: 1.6em; 
+            font-size: 1.8em; 
             color: #005a9c;
             border-bottom: 2px solid #005a9c;
             padding-bottom: 8px; 
             margin-top: 0;
+            margin-bottom: 20px;
         }
+        
+        /* QI Group Container */
+        .qi-group {
+            margin-bottom: 25px;
+        }
+        
+        .qi-group-title {
+            font-size: 1.2em;
+            color: #555;
+            font-weight: bold;
+            margin-bottom: 10px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
         .pack-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); /* Smaller cards */
             gap: 15px; 
         }
+        
+        /* Compact Pack Card */
         .pack-card {
             display: block;
             background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05); 
-            padding: 15px; 
+            border-radius: 6px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); 
+            padding: 12px; 
             text-decoration: none;
             color: #333;
             transition: all 0.2s ease;
-            border-left: 5px solid #005a9c;
+            border-left: 4px solid #ccc; /* Default border color */
+            position: relative;
+            overflow: hidden;
         }
         .pack-card:hover {
             transform: translateY(-3px);
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
+        
         .pack-card h3 {
-            font-size: 1.2em; 
+            font-size: 1.0em; 
             color: #005a9c;
-            margin-top: 0;
-            margin-bottom: 5px;
+            margin: 0 0 8px 0;
+            line-height: 1.3;
+            height: 2.6em; /* Fixed height for roughly 2 lines */
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
         }
-        .pack-card p {
-            font-size: 0.9em;
-            margin: 3px 0 0 0;
-            color: #555;
-        }
-        .pack-card .pack-qi {
+        
+        /* Score Badge */
+        .pack-score-badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 0.85em;
             font-weight: bold;
-            font-size: 0.9em;
-            color: #008a00; /* Green for QI */
+            color: white;
+            background-color: #777; /* Fallback */
         }
+        
+        /* Dynamic Border/Badge Colors based on Score */
+        .score-6 { border-left-color: #005a9c; } /* Excellent - Blue */
+        .badge-6 { background-color: #005a9c; }
+        
+        .score-5 { border-left-color: #008a00; } /* Very Good - Green */
+        .badge-5 { background-color: #008a00; }
+        
+        .score-4 { border-left-color: #5cb85c; } /* Good - Light Green */
+        .badge-4 { background-color: #5cb85c; }
+        
+        .score-3 { border-left-color: #f0ad4e; } /* Satisfactory - Yellow/Orange */
+        .badge-3 { background-color: #f0ad4e; }
+        
+        .score-2 { border-left-color: #d9534f; } /* Weak - Red */
+        .badge-2 { background-color: #d9534f; }
+        
+        .score-1 { border-left-color: #d9534f; } /* Unsatisfactory - Red */
+        .badge-1 { background-color: #d9534f; }
+        
         /* --- End of Evidence Pack Section --- */
 
 
-        /* --- NEW: Main Layout Grid --- */
+        /* --- Main Layout Grid --- */
         .main-layout {
             display: grid;
             grid-template-columns: 250px 1fr; /* Fixed Sidebar | Flexible Content */
@@ -328,13 +375,14 @@
     ================================== -->
     <section class="pack-section">
         <h2>High Impact Evidence Packs</h2>
-        <div class="pack-grid" id="evidence-pack-grid">
+        <!-- This container will be populated by JavaScript with grouped sections -->
+        <div id="evidence-pack-container">
             <!-- Populated by JS -->
         </div>
     </section>
 
     <!-- =================================
-         MAIN LAYOUT: Sidebar + Content
+         EVIDENCE LIBRARY SEARCH
     ================================== -->
     <div class="main-layout">
         
@@ -387,17 +435,10 @@
     </div>
 
     <script>
-        // --- *** DATA IS NOW LOADED EXTERNALLY FROM THE <head> SCRIPT TAGS *** ---
-
         document.addEventListener('DOMContentLoaded', () => {
             // Data sources
-            // Use placeholder data ONLY if the external files failed to load
-            const files = (typeof myFiles !== 'undefined') ? myFiles : [
-                { "Name": "Placeholder File 1", "QIs": "1.3", "Tags": "Example", "EvidenceDescription": "This is a placeholder.", "Session": "2024/25", "Status": "Complete", "Link": "#" }
-            ];
-            const packs = (typeof evidencePacks !== 'undefined') ? evidencePacks : [
-                { "id": 0, "title": "Placeholder Pack", "primary_qi": "1.3", "secondary_qi": "2.3", "hgios_score": 4 }
-            ];
+            const files = (typeof myFiles !== 'undefined') ? myFiles : [];
+            const packs = (typeof evidencePacks !== 'undefined') ? evidencePacks : [];
 
             // DOM Elements
             const searchInput = document.getElementById('searchInput');
@@ -407,13 +448,13 @@
             const tagFilterButtons = document.getElementById('tagFilterButtons');
             const resultsTableBody = document.getElementById('resultsTableBody');
             const resultsCount = document.getElementById('resultsCount');
-            const evidencePackGrid = document.getElementById('evidence-pack-grid');
             
-            let currentSort = { column: 'Name', direction: 'asc' };
-
             // HGIOS Lookup
             const hgiosText = { 1: "Unsatisfactory", 2: "Weak", 3: "Satisfactory", 4: "Good", 5: "Very Good", 6: "Excellent" };
             
+            // Define currentSort here to avoid ReferenceError
+            let currentSort = { column: 'Name', direction: 'asc' };
+
             // --- Helper to format newlines ---
             function formatMarkdown(text) {
                 if (!text) return 'N/A'; // Return N/A for null/empty
@@ -421,26 +462,63 @@
                 return marked.parse(text, { breaks: true }); // 'breaks: true' turns newlines into <br>
             }
 
-            // --- Load Evidence Packs ---
+            // --- Load Evidence Packs (Grouped by QI) ---
             function loadEvidencePacks() {
-                if (packs.length === 0 || (packs.length === 1 && packs[0].title === "Placeholder Pack")) {
-                    evidencePackGrid.innerHTML = "<p>No evidence packs found. Run the VBA macro to generate 'evidencepackdata.js'.</p>";
-                } else {
-                     let packsHtml = "";
-                    packs.forEach(pack => {
+                const container = document.getElementById('evidence-pack-container');
+                if (packs.length === 0) {
+                    container.innerHTML = "<p>No evidence packs found. Run the VBA macro to generate 'evidencepackdata.js'.</p>";
+                    return;
+                }
+
+                // 1. Group packs by Primary QI
+                // We use a Map to preserve order of insertion (or could sort keys)
+                const packsByQI = new Map();
+                
+                // Sort packs by QI first to ensure groups appear in order (e.g. 1.3, then 2.3)
+                const sortedPacks = [...packs].sort((a, b) => {
+                    const qiA = a.primary_qi || "Other";
+                    const qiB = b.primary_qi || "Other";
+                    return qiA.localeCompare(qiB, undefined, {numeric: true});
+                });
+
+                sortedPacks.forEach(pack => {
+                    const qi = pack.primary_qi || "Other";
+                    if (!packsByQI.has(qi)) {
+                        packsByQI.set(qi, []);
+                    }
+                    packsByQI.get(qi).push(pack);
+                });
+
+                // 2. Build HTML for each group
+                let fullHtml = "";
+                
+                packsByQI.forEach((groupPacks, qiName) => {
+                    let groupHtml = `
+                        <div class="qi-group">
+                            <div class="qi-group-title">${qiName}</div>
+                            <div class="pack-grid">
+                    `;
+                    
+                    groupPacks.forEach(pack => {
                         const score = parseInt(pack.hgios_score, 10);
                         const scoreText = hgiosText[score] || 'N/A';
                         
-                        packsHtml += `
-                            <a href="evidence_pack_viewer.html?index=${pack.id}" class="pack-card" target="_blank">
+                        groupHtml += `
+                            <a href="evidence_pack_viewer.html?index=${pack.id}" class="pack-card score-${score}" target="_blank">
                                 <h3>${pack.title}</h3>
-                                <p class="pack-qi">QI: ${pack.primary_qi}</p>
-                                <p>HGIOS Score: ${score} - ${scoreText}</p>
+                                <span class="pack-score-badge badge-${score}">${score} - ${scoreText}</span>
                             </a>
                         `;
                     });
-                    evidencePackGrid.innerHTML = packsHtml;
-                }
+                    
+                    groupHtml += `
+                            </div>
+                        </div>
+                    `;
+                    fullHtml += groupHtml;
+                });
+                
+                container.innerHTML = fullHtml;
             }
 
             // --- Populate Filter Buttons ---
