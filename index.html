@@ -236,7 +236,9 @@
             <!-- Theme Bar -->
             <div class="bg-white p-6 rounded-xl shadow-sm border border-slate-200 mb-8 print:break-before-auto mt-6">
                 <h3 class="text-lg font-bold text-slate-800 mb-4">Detailed Theme Performance</h3>
-                <div class="h-80 w-full"><canvas id="themeBarChart"></canvas></div>
+                <div class="h-80 w-full relative">
+                    <canvas id="themeBarChart"></canvas>
+                </div>
             </div>
 
         </div>
@@ -803,7 +805,8 @@
                 dash.classList.remove('hidden');
                 btn.innerHTML = '<i class="fa-solid fa-pen-to-square mr-2"></i> Back to Assessment';
                 body.classList.add('printing-dashboard');
-                renderDashboard();
+                // Add slight delay to allow DOM reflow for canvas
+                setTimeout(renderDashboard, 50);
             } else {
                 dash.classList.add('hidden');
                 btn.innerHTML = '<i class="fa-solid fa-chart-pie mr-2"></i> Visualise Dashboard';
@@ -922,9 +925,10 @@
 
             if(strengthList.innerHTML === '') strengthList.innerHTML = '<li class="text-slate-400 italic">No secure "Excellent" ratings recorded yet.</li>';
 
-            renderRadar(radarLabels, radarData);
-            renderConfidence(secureCount, partialCount);
-            renderThemeBar(themeLabels, themeData, themeColors);
+            // Only render charts if canvases are present
+            if(document.getElementById('radarChart')) renderRadar(radarLabels, radarData);
+            if(document.getElementById('confidenceChart')) renderConfidence(secureCount, partialCount);
+            if(document.getElementById('themeBarChart')) renderThemeBar(themeLabels, themeData, themeColors);
         }
 
         function renderRadar(labels, data) {
@@ -989,6 +993,11 @@
         }
 
         function renderThemeBar(labels, data, colors) {
+            if(!labels || labels.length === 0) {
+                console.warn("No theme data available for bar chart.");
+                return; // Prevent blank canvas error or empty render
+            }
+            
             const ctx = document.getElementById('themeBarChart').getContext('2d');
             if(chartInstances.bar) chartInstances.bar.destroy();
 
