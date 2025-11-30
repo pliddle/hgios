@@ -88,8 +88,8 @@
     {
         "id": 4,
         "title": "Developing nurturing classrooms",
-        "primary_qi": "2.3 Learning Teaching and Assessment",
-        "secondary_qi": "3.1 Ensuring Wellbeing, Equality and Inclusion\n\n1.3 Leadership of Change",
+        "primary_qi": "3.1 Ensuring Wellbeing, Equality and Inclusion",
+        "secondary_qi": "2.3 Learning, Teaching and Assessment",
         "hgios_score": 5,
         "tags": [],
         "what_text": "Nurture principals have been fully embedded in the school since EDC launched training at the time that our wellbeing (nurture) rooms were launched. Following the introduction of the wellbeing room and wellbeing teacher, further CLPL focussed on ACEs and Trauma Informed Practice, leading to a shared understanding of wellbeing and a climate where young people felt safe and secure. \n\nPost-Covid self evaluation highlighted a need and opportunity to revisit whole school approaches towards nurture through a range of strands, including our approach towards promoting positive behaviour and a focus on developing more inclusive and nurturing classrooms. \n\nThe focus on further developing inclusive classrooms is being led through engagement with the CIRCLE framework, in line with local authority and school improvement priorities. In year 1, four departments led on the introduction of the Inclusive classroom scale, gathering and sharing evidence at local authority level throughout the year. This year, following whole-school inservice input, all departments in school are now engaging with CICS, with further evidence to be gathered as to the impact throughout the session, informing planning for next session. ",
@@ -171,7 +171,7 @@
         "id": 7,
         "title": "Eco Schools",
         "primary_qi": "1.3 Leadership of Change",
-        "secondary_qi": "3.1 Improving Wellbeing, Equality and Inclusion",
+        "secondary_qi": "3.1 Ensuring Wellbeing, Equality and Inclusion",
         "hgios_score": 6,
         "tags": [],
         "what_text": "As part of improvement around Wider Achievement, the school, the Acting Principal Teacher of Wider Achievement has led the work to achieve the Eco Schools Green Flag.\n\nOver the last two sessions, Alice has:\n\n\n\n- Created a group of “Eco Ambassadors” that have volunteered to carry out work on behalf of the Eco Schools group.\n\n- Organised community linked litter picks and representation at local events such as the Bearsden in Bloom and Bearsden Festival\n\n- Created an action plan to allow pupils to plan, measure and demonstrate change\n\n- Led events in the local community including at the Christmas Fair\n\n- Organised fashion swap shops for the promotion reusability and recycling\n\n- Created bug hotels for the school grounds\n\n- Collaborated with Art projects such as the Coral Reef project\n\nCollaborated with local primaries on initiatives such as the litter pick",
@@ -587,3 +587,4 @@
     }
 
 ];
+
