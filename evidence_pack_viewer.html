@@ -44,18 +44,133 @@
             text-align: center;
         }
 
-        /* --- Header Styling --- */
+        /* --- Header Styling (Matched with Index) --- */
         .header-container {
             padding-bottom: 10px;
-            border-bottom: 1px solid #eee;
+            border-bottom: 2px solid #ccc; /* Updated to match index */
             margin-bottom: 10px;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            position: relative; 
         }
         .header-container img {
             height: 60px;
             width: auto; 
+        }
+        
+        /* --- Menu Button --- */
+        #menu-toggle-btn {
+            background: none;
+            border: none;
+            color: #005a9c;
+            font-size: 28px;
+            cursor: pointer;
+            padding: 5px 10px;
+            border-radius: 4px;
+            transition: background 0.2s;
+        }
+        #menu-toggle-btn:hover {
+            background-color: #f0f0f0;
+        }
+
+        /* --- Settings Menu (Sidebar) --- */
+        #settings-menu {
+            position: fixed;
+            top: 0;
+            right: -320px; 
+            width: 320px;
+            height: 100vh;
+            background-color: #ffffff;
+            box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+            z-index: 2000;
+            transition: right 0.3s ease-in-out;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        #settings-menu.open {
+            right: 0;
+        }
+        
+        /* Menu Overlay (Click to close) */
+        #menu-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.3);
+            z-index: 1999;
+            display: none;
+        }
+        #menu-overlay.open {
+            display: block;
+        }
+
+        .menu-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 15px;
+            margin-bottom: 15px;
+        }
+        .menu-header h3 {
+            margin: 0;
+            color: #005a9c;
+        }
+        .close-menu-btn {
+            background: none;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+            color: #555;
+        }
+
+        /* Menu Pack List */
+        .menu-scroll-area {
+            flex-grow: 1;
+            overflow-y: auto;
+            margin-bottom: 20px;
+            padding-right: 5px; 
+        }
+        
+        .menu-pack-item {
+            display: block;
+            background-color: #f9f9f9;
+            border-radius: 4px;
+            padding: 10px;
+            margin-bottom: 8px;
+            text-decoration: none;
+            color: #333;
+            border-left: 4px solid #ccc;
+            font-size: 0.9em;
+            transition: all 0.2s;
+        }
+        .menu-pack-item:hover {
+            transform: translateX(2px);
+            background-color: #f0f0f0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .menu-pack-item.active {
+            background-color: #e6f0ff;
+            border-left-width: 6px;
+            font-weight: 600;
+        }
+        
+        .menu-pack-qi {
+            display: block;
+            font-size: 0.85em;
+            color: #666;
+            margin-bottom: 2px;
+        }
+
+        /* Menu Actions (Print Buttons) */
+        .menu-actions {
+            border-top: 2px solid #eee;
+            padding-top: 15px;
         }
 
         h1 {
@@ -182,6 +297,14 @@
         .hgios-5-verygood { background-color: #008a00; border-color: #006b00; } 
         .hgios-6-excellent { background-color: #005a9c; border-color: #004475; } 
 
+        /* CSS Classes for Menu Items */
+        .menu-score-6 { border-left-color: #005a9c; }
+        .menu-score-5 { border-left-color: #008a00; }
+        .menu-score-4 { border-left-color: #5cb85c; }
+        .menu-score-3 { border-left-color: #f0ad4e; }
+        .menu-score-2 { border-left-color: #E67E22; }
+        .menu-score-1 { border-left-color: #d9534f; }
+        .menu-score-na { border-left-color: #999; }
 
         /* --- Section Styling --- */
         section {
@@ -436,8 +559,13 @@
         #visual-evidence-print-list {
             display: none; /* Hidden on screen */
         }
+        
+        /* --- Bulk Print Container (Hidden on Screen) --- */
+        #bulk-print-container {
+            display: none;
+        }
 
-        /* --- NEW: COMMENT BOX & RESTORE TAB CSS --- */
+        /* --- COMMENT BOX & RESTORE TAB CSS --- */
         #comment-box {
             position: fixed;
             bottom: 20px;
@@ -589,9 +717,61 @@
             text-decoration: none;
             cursor: pointer;
         }
+        
+        /* Message Modal Styling (uses .modal base) */
+        #message-modal .modal-content {
+            margin: 15% auto;
+            max-width: 400px; 
+            padding: 20px; 
+            background-color: white; 
+            border-radius: 8px;
+            text-align: left;
+        }
+        
+        #message-modal .close-modal {
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            color: #333;
+            font-size: 28px;
+            cursor: pointer;
+        }
+        #message-modal .close-modal:hover {
+            color: #000;
+        }
 
-
-        /* --- Evidence Table Styles --- */
+        /* --- Print Button --- */
+        .print-buttons-container {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .print-button {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background-color: #005a9c;
+            color: #fff;
+            text-align: center;
+            text-decoration: none;
+            font-size: 1.2em;
+            font-weight: bold;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-bottom: 10px; /* space between buttons */
+        }
+        .print-button:hover {
+            background-color: #004475;
+        }
+        .bulk-print-button {
+             background-color: #555;
+        }
+        .bulk-print-button:hover {
+             background-color: #333;
+        }
+        
+        /* --- Evidence Table Styles (Copied & Adapted from Index) --- */
         .evidence-table-container {
             overflow-x: auto;
             background-color: #fff; 
@@ -613,14 +793,18 @@
             word-break: break-word;
             vertical-align: top;
         }
+        
+        /* Grey Header Background (Matched from Index) */
         .evidence-table th {
             background-color: #f9f9f9;
             font-weight: 600;
             color: #333;
         }
+        
         .evidence-table tr:hover {
             background-color: #f4f8fb;
         }
+        
         .evidence-table td a {
             font-weight: 600;
             color: #005a9c;
@@ -629,7 +813,8 @@
         .evidence-table td a:hover {
             text-decoration: underline;
         }
-        /* Column widths */
+        
+        /* Column widths (Matched from Index) */
         .evidence-table th:nth-child(1) { width: 25%; } /* Name */
         .evidence-table th:nth-child(2) { width: 10%; } /* QIs */
         .evidence-table th:nth-child(3) { width: 15%; } /* Tags */
@@ -637,38 +822,19 @@
         .evidence-table th:nth-child(5) { width: 10%; } /* Session */
         .evidence-table th:nth-child(6) { width: 10%; } /* Status */
         
+        /* --- NEW: Table QI Label Style (Copied from Index) --- */
         .table-qi-label {
             display: inline-block;
-            padding: 3px 10px; 
+            padding: 2px 6px; 
             font-size: 11px; 
             font-weight: bold;
             color: #fff;
-            background-color: #005a9c; /* HGIOS Blue */
-            border-radius: 15px;
+            background-color: #005a9c; /* Blue Button Style */
+            border-radius: 10px; /* Rounded corners */
             margin-bottom: 3px; 
             margin-right: 3px;
             cursor: default; 
-        }
-
-        
-        /* --- Print Button --- */
-        .print-button {
-            display: block;
-            width: 100%;
-            padding: 15px;
-            background-color: #005a9c;
-            color: #fff;
-            text-align: center;
-            text-decoration: none;
-            font-size: 1.2em;
-            font-weight: bold;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            margin-top: 20px;
-        }
-        .print-button:hover {
-            background-color: #004475;
+            white-space: nowrap;
         }
 
 
@@ -690,7 +856,8 @@
             }
 
             /* 2. Hide Non-Print Elements */
-            .print-button, #comment-box, #restore-tab {
+            /* Crucial: Hide the new menu, but allow print actions via JS logic */
+            #settings-menu, #menu-overlay, #menu-toggle-btn, #comment-box, #restore-tab, .search-container {
                 display: none !important; 
             }
             .header-container, #error-banner, .view-mode-controls, .modal {
@@ -715,9 +882,11 @@
             .visual-grid, .visual-carousel { 
                 display: none !important; 
             }
+            /* Hide the evidence list table */
             #evidence {
                 display: none !important; /* Hide the table view for print */
             }
+            /* Show the print-friendly list */
             #visual-evidence-print-list {
                 display: block !important; /* Show the print-friendly list */
             }
@@ -746,33 +915,69 @@
                 text-align: center;
                 color: #333;
             }
-        }
-
-        /* Message Modal Styling (uses .modal base) */
-        #message-modal .modal-content {
-            margin: 15% auto;
-            max-width: 400px; 
-            padding: 20px; 
-            background-color: white; 
-            border-radius: 8px;
-            text-align: left;
+            
+            /* 6. Bulk Print Specifics */
+            .bulk-print-page-break {
+                page-break-after: always;
+            }
+            /* If bulk printing, hide the main single-pack container content to avoid duplicates/confusion */
+            /* We toggle a class on body to control this */
+            body.bulk-printing .single-pack-content {
+                display: none;
+            }
+            body.bulk-printing #bulk-print-container {
+                display: block;
+            }
         }
         
-        #message-modal .close-modal {
-            position: absolute;
-            top: 10px;
-            right: 15px;
-            color: #333;
-            font-size: 28px;
+        /* --- Sortable Header Styles --- */
+        th[data-column] {
             cursor: pointer;
+            position: relative;
+            padding-right: 20px; 
         }
-        #message-modal .close-modal:hover {
-            color: #000;
+        th[data-column]::after {
+            content: '';
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            opacity: 0.3;
+            width: 0; 
+            height: 0;
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+        }
+        th.sort-asc::after {
+            opacity: 1;
+            border-bottom: 5px solid #333;
+        }
+        th.sort-desc::after {
+            opacity: 1;
+            border-top: 5px solid #333;
         }
 
     </style>
 </head>
 <body>
+
+    <!-- OVERLAY for Menu -->
+    <div id="menu-overlay" onclick="toggleMenu()"></div>
+
+    <!-- SETTINGS MENU -->
+    <div id="settings-menu">
+        <div class="menu-header">
+            <h3>Evidence Packs</h3>
+            <button class="close-menu-btn" onclick="toggleMenu()">&times;</button>
+        </div>
+        <div id="menu-pack-list" class="menu-scroll-area">
+            <!-- List populated by JS -->
+        </div>
+        <div class="menu-actions">
+            <button class="print-button" onclick="window.print()">Print This Pack</button>
+            <button class="print-button bulk-print-button" onclick="printAllPacks()">Print All Packs</button>
+        </div>
+    </div>
 
     <div class="container">
         
@@ -782,110 +987,132 @@
         <!-- HEADER -->
         <div class="header-container">
             <img src="image/badge.png" alt="School Logo" class="header-image" onerror="this.src='https://placehold.co/150x60/eee/ccc?text=School+Logo'" >
+            <div style="flex-grow: 1;"></div> <!-- Spacer -->
             <img src="image/values.png" alt="Council Logo" class="header-image" onerror="this.src='https://placehold.co/150x60/eee/ccc?text=Council+Logo'">
-        </div>
-
-        <!-- TITLE & META -->
-        <h1 id="pack-title">Loading...</h1>
-
-        <div class="pack-meta">
-            <div class="qi-labels">
-                <span class="qi-label qi-primary" id="primary-qi"></span>
-                <span class="qi-label qi-secondary" id="secondary-qi"></span>
-            </div>
-            <div class="impact-score">
-                <strong id="hgios-rating-text"></strong>
-                <div class="impact-meter" id="hgios-meter">
-                    <!-- This will be generated by JavaScript -->
-                </div>
-            </div>
+            <button id="menu-toggle-btn" onclick="toggleMenu()">&#9776;</button>
         </div>
         
-        <!-- VISUAL EVIDENCE -->
-        <section id="visual-evidence">
-            <h2>Visual Evidence</h2>
-            
-            <!-- Mode Switcher -->
-            <div class="view-mode-controls">
-                <button class="view-mode-btn active" id="btn-grid-view" onclick="switchView('grid')">Grid View</button>
-                <button class="view-mode-btn" id="btn-carousel-view" onclick="switchView('carousel')">Carousel View</button>
-            </div>
+        <!-- SINGLE PACK CONTENT WRAPPER -->
+        <div class="single-pack-content">
 
-            <!-- Grid View (Screen) -->
-            <div class="visual-grid" id="visual-evidence-grid"></div>
-
-            <!-- Carousel View (Screen) -->
-            <div class="visual-carousel" id="visual-evidence-carousel">
-                <div id="carousel-slides-container">
-                    <!-- Slides injected here -->
+            <!-- TITLE & META -->
+            <h1 id="pack-title">Loading...</h1>
+    
+            <div class="pack-meta">
+                <div class="qi-labels">
+                    <span class="qi-label qi-primary" id="primary-qi"></span>
+                    <span class="qi-label qi-secondary" id="secondary-qi"></span>
                 </div>
-                <div class="carousel-controls">
-                    <button class="carousel-btn" onclick="moveCarousel(-1)">Previous</button>
-                    <span class="carousel-counter" id="carousel-counter">1 of 5</span>
-                    <button class="carousel-btn" onclick="moveCarousel(1)">Next</button>
+                <div class="impact-score">
+                    <strong id="hgios-rating-text"></strong>
+                    <div class="impact-meter" id="hgios-meter">
+                        <!-- This will be generated by JavaScript -->
+                    </div>
                 </div>
             </div>
             
-            <!-- Print List View (Hidden on Screen) -->
-            <div id="visual-evidence-print-list">
-                <!-- List items injected here -->
-            </div>
-        </section>
+            <!-- VISUAL EVIDENCE -->
+            <section id="visual-evidence">
+                <h2>Visual Evidence</h2>
+                
+                <!-- Mode Switcher -->
+                <div class="view-mode-controls">
+                    <button class="view-mode-btn active" id="btn-grid-view" onclick="switchView('grid')">Grid View</button>
+                    <button class="view-mode-btn" id="btn-carousel-view" onclick="switchView('carousel')">Carousel View</button>
+                </div>
+    
+                <!-- Grid View (Screen) -->
+                <div class="visual-grid" id="visual-evidence-grid"></div>
+    
+                <!-- Carousel View (Screen) -->
+                <div class="visual-carousel" id="visual-evidence-carousel">
+                    <div id="carousel-slides-container">
+                        <!-- Slides injected here -->
+                    </div>
+                    <div class="carousel-controls">
+                        <button class="carousel-btn" onclick="moveCarousel(-1)">Previous</button>
+                        <span class="carousel-counter" id="carousel-counter">1 of 5</span>
+                        <button class="carousel-btn" onclick="moveCarousel(1)">Next</button>
+                    </div>
+                </div>
+                
+                <!-- Print List View (Hidden on Screen) -->
+                <div id="visual-evidence-print-list">
+                    <!-- List items injected here -->
+                </div>
+            </section>
+    
+            <!-- WHAT -->
+            <section id="what">
+                <h2>What: Our Practice & Evidence</h2>
+                <div id="what-text" class="text-content"></div> 
+                
+                <!-- Updated heading ID for JS control -->
+                <h3 id="participation-heading">Participation Summary</h3>
+                <div class="quant-grid" id="participation-grid"></div>
+            </section>
+    
+            <!-- SO WHAT -->
+            <section id="so-what">
+                <h2>So What: The Impact & Outcomes</h2>
+                <div id="so-what-text" class="text-content"></div>
+                
+                <!-- UPDATED: Added ID for JS control -->
+                <h3 id="impact-heading">Quantitative Summary (Impact)</h3>
+                <div class="quant-grid" id="impact-grid"></div>
+                
+                <!-- UPDATED: Added ID for JS control -->
+                <h3 id="qualitative-heading">Qualitative Summary</h3>
+                <div class="qual-container" id="qualitative-bubbles"></div>
+            </section>
+    
+            <!-- WHAT NOW -->
+            <section id="what-now">
+                <h2>What Now: The Next Steps</h2>
+                <div id="what-now-text" class="text-content"></div>
+            </section>
+    
+            <!-- COLLATED EVIDENCE TABLE -->
+            <section id="evidence">
+                <h2>Collated Evidence Files</h2>
+                <p>The following files from the Evidence Library are tagged with this Evidence Pack:</p>
+                
+                <!-- NEW SEARCH CONTAINER FOR TABLE -->
+                <div class="search-container">
+                    <div class="filter-grid">
+                        <div class="search-box">
+                            <input type="text" id="searchInput" placeholder="Search files...">
+                            <button id="clearButton" class="control-button">Clear</button>
+                        </div>
+                        <!-- Filters could be added here if needed, but keeping it simple for now -->
+                    </div>
+                </div>
 
-        <!-- WHAT -->
-        <section id="what">
-            <h2>What: Our Practice & Evidence</h2>
-            <div id="what-text" class="text-content"></div> 
-            
-            <!-- Updated heading ID for JS control -->
-            <h3 id="participation-heading">Participation Summary</h3>
-            <div class="quant-grid" id="participation-grid"></div>
-        </section>
-
-        <!-- SO WHAT -->
-        <section id="so-what">
-            <h2>So What: The Impact & Outcomes</h2>
-            <div id="so-what-text" class="text-content"></div>
-            
-            <!-- UPDATED: Added ID for JS control -->
-            <h3 id="impact-heading">Quantitative Summary (Impact)</h3>
-            <div class="quant-grid" id="impact-grid"></div>
-            
-            <!-- UPDATED: Added ID for JS control -->
-            <h3 id="qualitative-heading">Qualitative Summary</h3>
-            <div class="qual-container" id="qualitative-bubbles"></div>
-        </section>
-
-        <!-- WHAT NOW -->
-        <section id="what-now">
-            <h2>What Now: The Next Steps</h2>
-            <div id="what-now-text" class="text-content"></div>
-        </section>
-
-        <!-- COLLATED EVIDENCE TABLE -->
-        <section id="evidence">
-            <h2>Collated Evidence Files</h2>
-            <p>The following files from the Evidence Library are tagged with this Evidence Pack:</p>
-            <div class="evidence-table-container">
-                <table class="evidence-table">
-                    <thead>
-                        <tr>
-                            <th>Name</th>
-                            <th>QIs</th>
-                            <th>Tags</th>
-                            <th>Description</th>
-                            <th>Session(s)</th>
-                            <th>Status</th>
-                        </tr>
-                    </thead>
-                    <tbody id="pack-evidence-table-body">
-                        <!-- Populated by JS -->
-                    </tbody>
-                </table>
-            </div>
-        </section>
-
-        <button class="print-button" onclick="window.print()">Print / Save as PDF</button>
+                <div class="evidence-table-container">
+                    <table class="evidence-table">
+                        <thead>
+                            <tr>
+                                <th data-column="Name">Name</th>
+                                <th data-column="QIs">QIs</th>
+                                <th data-column="Tags">Tags</th>
+                                <th data-column="EvidenceDescription">Description</th>
+                                <th data-column="Session">Session(s)</th>
+                                <th data-column="Status">Status</th>
+                            </tr>
+                        </thead>
+                        <tbody id="pack-evidence-table-body">
+                            <!-- Populated by JS -->
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+        
+        </div>
+        <!-- END SINGLE PACK CONTENT -->
+        
+        <!-- BULK PRINT CONTAINER (Hidden until print) -->
+        <div id="bulk-print-container"></div>
+        
     </div>
 
     <!-- IMAGE VIEWER MODAL -->
@@ -914,13 +1141,14 @@
     </div>
 
 
-    <!-- NEW: COMMENT BOX (Initially hidden via CSS) -->
+    <!-- NEW: COMMENT BOX (Initially hidden in CSS) -->
     <div id="comment-box">
         <!-- The h3 element acts as the drag handle -->
         <h3>Feedback & Comments
             <button class="minimize-btn" onclick="toggleCommentBox()">&times;</button>
         </h3>
         <textarea id="comment-input" 
+            placeholder="Enter your detailed feedback here..."
             onfocus="handleFocus(this)"
             onblur="handleBlur(this)"></textarea>
         <button id="submit-comment-btn" onclick="submitComment()">Submit Feedback</button>
@@ -933,6 +1161,8 @@
         let totalSlides = 0;
         let currentPackIndex = 0; // Global variable for the current pack index
         let currentPackTitle = ""; // Global variable for the current pack title
+        let currentTableFiles = []; // Store files for current pack for searching/sorting
+        let currentSort = { column: 'Name', direction: 'asc' }; // For table sorting
         
         // --- DATA LOADING & INITIALIZATION ---
         const files = (typeof myFiles !== 'undefined') ? myFiles : [];
@@ -955,6 +1185,20 @@
         function closeMessageModal() {
             document.getElementById('message-modal').style.display = 'none';
         }
+
+        // --- Toggle Menu Functions ---
+        function toggleMenu() {
+            const menu = document.getElementById('settings-menu');
+            const overlay = document.getElementById('menu-overlay');
+            if (menu.classList.contains('open')) {
+                menu.classList.remove('open');
+                overlay.classList.remove('open');
+            } else {
+                menu.classList.add('open');
+                overlay.classList.add('open');
+            }
+        }
+
 
         function formatMarkdown(text, allFiles) {
             const usedImages = new Set();
@@ -988,6 +1232,7 @@
             return { html: markdownHtml, usedImages };
         }
         
+        // buildImageEmbed with updated encoding/decoding for caption
         function buildImageEmbed(item) {
             const placeholderText = 'Please log in to%0ASharePoint%0Ato view image';
             const placeholderUrl = `https://placehold.co/600x400/f4f8fb/777?text=${placeholderText}`;
@@ -995,9 +1240,12 @@
             let caption = item.EvidenceDescription ? item.EvidenceDescription : item.Name;
             const captionHtml = marked.parse(caption, { breaks: true });
             
+            // 1. Escape single quotes for the URL parameter in the JS call
             const safeUrl = item.Link.replace(/'/g, "\\'");
-            const safeCaption = captionHtml.replace(/'/g, "\\'").replace(/"/g, '&quot;');
+            // 2. Encode the HTML caption safely
+            const encodedCaption = encodeURIComponent(captionHtml);
 
+            // 3. The inline onclick calls decodeURIComponent()
             return `
                 <div class="embedded-media-container" onclick="openModal('${safeUrl}', decodeURIComponent('${encodedCaption}'))">
                     <img src="${item.Link}" alt="${item.Name}" class="embedded-media-img" onerror="${onErrorScript}">
@@ -1017,6 +1265,7 @@
         function buildHtmlList(items, itemType, allFiles) {
             let html = "";
             const usedImages = new Set();
+            // Check if items exist and are not just empty strings
             if (!items || items.length === 0) return { html: "", usedImages }; 
             
             let hasContent = false;
@@ -1076,25 +1325,32 @@
             return new Set();
         }
 
-        function populateEvidenceTable(packTitle, allFiles, usedImages) {
-            const tableBody = document.getElementById('pack-evidence-table-body');
-            if (!tableBody) return;
-
-            const matchingFiles = allFiles.filter(file => 
+        // --- NEW: Populate initial data for table ---
+        function populateEvidenceTableData(packTitle, allFiles, usedImages) {
+             const matchingFiles = allFiles.filter(file => 
             (file["Evidence Pack Name"] || "").split(/[;,]\s*/).includes(packTitle) &&
                 (!file.ItemType || file.ItemType.toLowerCase() !== 'folder') &&
                 (file.QIs && file.QIs.trim() !== '') 
             );
 
-            const filteredFiles = matchingFiles.filter(file => !usedImages.has(file.Name));
+            // Filter out files that are already displayed in the visual section (usedImages)
+            currentTableFiles = matchingFiles.filter(file => !usedImages.has(file.Name));
+            
+            renderEvidenceTable(currentTableFiles);
+        }
 
-            if (filteredFiles.length === 0) {
-                tableBody.innerHTML = '<tr><td colspan="6">No associated files found in the library.</td></tr>';
+        // --- NEW: Render table from provided list (for search/sort) ---
+        function renderEvidenceTable(fileList) {
+            const tableBody = document.getElementById('pack-evidence-table-body');
+            if (!tableBody) return;
+
+            if (fileList.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="6">No associated files found.</td></tr>';
                 return;
             }
 
             let tableHtml = "";
-            filteredFiles.forEach(item => {
+            fileList.forEach(item => {
                 let qiHtml = 'N/A';
                 if (item.QIs) {
                     const qis = item.QIs.split(';').map(qi => qi.replace(/#/g, '').trim()).filter(qi => qi); 
@@ -1107,7 +1363,10 @@
                     }
                 }
                 const cleanSessions = item.Session ? item.Session.replace(/#/g, '') : 'N/A';
-                const result = formatMarkdown(item.EvidenceDescription || 'N/A', allFiles);
+                // Using formatMarkdown for description in table too, but passing empty list for files 
+                // to avoid recursive image embedding within the table itself if descriptions contain shortcodes.
+                // Or pass 'allFiles' if you WANT images in the table descriptions. Let's pass allFiles.
+                const result = formatMarkdown(item.EvidenceDescription || 'N/A', files); 
 
                 tableHtml += `
                     <tr>
@@ -1123,6 +1382,60 @@
             tableBody.innerHTML = tableHtml;
         }
         
+        // --- NEW: Table Search Function ---
+        function performTableSearch() {
+            const searchInput = document.getElementById('searchInput');
+            if(!searchInput) return;
+            
+            const searchTerm = searchInput.value.toLowerCase();
+            
+            const filtered = currentTableFiles.filter(item => {
+                 const matchesSearchTerm = (
+                    (item.Name && item.Name.toLowerCase().includes(searchTerm)) ||
+                    (item.EvidenceDescription && item.EvidenceDescription.toLowerCase().includes(searchTerm)) ||
+                    (item.Status && item.Status.toLowerCase().includes(searchTerm)) ||
+                    (item.Tags && item.Tags.toLowerCase().includes(searchTerm)) ||
+                    (item.QIs && item.QIs.toLowerCase().includes(searchTerm))
+                );
+                return matchesSearchTerm;
+            });
+            
+            // Re-sort the filtered results based on current sort state
+            sortAndRender(filtered);
+        }
+        
+        // --- NEW: Clear Table Filter ---
+        function clearTableFilter() {
+            const searchInput = document.getElementById('searchInput');
+            if(searchInput) searchInput.value = '';
+            performTableSearch();
+        }
+        
+        // --- NEW: Sort Function ---
+        function sortAndRender(dataToList) {
+            const col = currentSort.column;
+            const dir = currentSort.direction;
+            
+            dataToList.sort((a, b) => {
+                let valA = a[col] || '';
+                let valB = b[col] || '';
+                
+                // Clean hashes/formatting for sort if needed
+                if (col === 'QIs' || col === 'Session') {
+                    valA = valA.replace(/#/g, '');
+                    valB = valB.replace(/#/g, '');
+                }
+
+                return dir === 'asc' ? 
+                    valA.localeCompare(valB, undefined, {numeric: true, sensitivity: 'base'}) : 
+                    valB.localeCompare(valA, undefined, {numeric: true, sensitivity: 'base'});
+            });
+            
+            renderEvidenceTable(dataToList);
+        }
+        
+        
+        // --- Visual Evidence Logic (Grid + Carousel + Print List) ---
         function populateVisualEvidence(packTitle, allFiles, usedImages) {
             const gridContainer = document.getElementById('visual-evidence-grid');
             const carouselContainer = document.getElementById('carousel-slides-container');
@@ -1162,6 +1475,7 @@
             matchingImages.forEach((item, idx) => {
                 visualSectionImages.add(item.Name);
 
+                // Escape strings
                 const safeUrl = item.Link.replace(/'/g, "\\'");
 
                 let caption = item.EvidenceDescription ? item.EvidenceDescription : item.Name;
@@ -1169,6 +1483,8 @@
                 const encodedCaption = encodeURIComponent(captionHtml);
 
 
+                // Grid Item (Refactored to put click handler on image wrapper)
+                // 3. The inline onclick calls decodeURIComponent()
                 gridHtml += `
                     <div class="visual-card">
                         <div class="visual-card-image-wrapper" onclick="openModal('${safeUrl}', decodeURIComponent('${encodedCaption}'))">
@@ -1178,6 +1494,7 @@
                     </div>
                 `;
                 
+                // Carousel Item (Updated to use the same click logic)
                 const activeClass = (idx === 0) ? 'active' : '';
                 carouselHtml += `
                     <div class="carousel-slide ${activeClass}" data-index="${idx}">
@@ -1188,6 +1505,7 @@
                     </div>
                 `;
                 
+                // Print List Item
                 printHtml += `
                     <div class="print-media-item">
                         <img src="${item.Link}" alt="${item.Name}" class="print-media-img" onerror="${onErrorScript}">
@@ -1204,6 +1522,8 @@
             return visualSectionImages;
         }
 
+        // --- MODAL FUNCTIONS ---
+        // Caption now receives correctly decoded HTML string
         function openModal(url, caption) {
             const modal = document.getElementById('image-modal');
             const modalImg = document.getElementById('modal-image');
@@ -1212,6 +1532,7 @@
             modal.style.display = "block";
             modalImg.src = url;
             
+            // Apply error handling to modal image too
             const placeholderText = 'Please log in to%0ASharePoint%0Ato view image';
             const placeholderUrl = `https://placehold.co/800x600/f4f8fb/777?text=${placeholderText}`;
             modalImg.onerror = function() { this.src = placeholderUrl; this.onerror = null; };
@@ -1223,6 +1544,7 @@
             document.getElementById('image-modal').style.display = "none";
         }
         
+        // Close modal if clicking outside image
         window.onclick = function(event) {
             const modal = document.getElementById('image-modal');
             const msgModal = document.getElementById('message-modal');
@@ -1233,6 +1555,8 @@
                 closeMessageModal();
             }
         }
+
+        // --- UI INTERACTION FUNCTIONS ---
 
         function switchView(mode) {
             const grid = document.getElementById('visual-evidence-grid');
@@ -1257,12 +1581,15 @@
             const slides = document.querySelectorAll('.carousel-slide');
             if (slides.length === 0) return;
             
+            // Hide current
             slides[currentSlideIndex].classList.remove('active');
             
+            // Calculate new index
             currentSlideIndex += direction;
             if (currentSlideIndex < 0) currentSlideIndex = totalSlides - 1;
             if (currentSlideIndex >= totalSlides) currentSlideIndex = 0;
             
+            // Show new
             slides[currentSlideIndex].classList.add('active');
             updateCarouselUI();
         }
@@ -1272,38 +1599,42 @@
             if(counter) counter.textContent = `${currentSlideIndex + 1} of ${totalSlides}`;
         }
         
+        // --- NEW: Minimization Logic ---
         function toggleCommentBox() {
             const box = document.getElementById('comment-box');
             const tab = document.getElementById('restore-tab');
             
             if (box.style.display !== 'none') {
+                // Minimize
                 box.style.display = 'none';
                 tab.style.display = 'block';
             } else {
-                box.style.display = 'flex'; 
+                // Restore
+                box.style.display = 'flex'; // Use flex to match comment-box CSS
                 tab.style.display = 'none';
             }
         }
 
+        // --- NEW: Custom Placeholder Logic ---
         const prompts = [
-            "This needs more about...\n",
-            "I don't understand...\n",
-            "I don't agree that...\n",
-            "Ask pupils about...\n",
-            "I like the bit about...\n"
+            "I don't understand...",
+            "There should be more about...",
+            "I don't agree that...",
+            "We need more pupil voice because...",
+            "This should link to...",
+            "The rating is too..."
         ];
 
         function setRandomPlaceholder(textarea) {
-            if (textarea.value.trim() === '' || prompts.includes(textarea.value)) {
-                const fullPromptBlock = prompts.join("");
-                textarea.value = fullPromptBlock;
+            if (textarea.value.trim() === '' || prompts.includes(textarea.value.trim())) {
+                const randomPrompt = prompts[Math.floor(Math.random() * prompts.length)];
+                textarea.value = randomPrompt;
                 textarea.classList.add('placeholder-text'); 
             }
         }
 
         function handleFocus(textarea) {
-            const fullPromptBlock = prompts.join("");
-            if (textarea.value === fullPromptBlock) {
+            if (textarea.classList.contains('placeholder-text')) {
                 textarea.value = '';
                 textarea.classList.remove('placeholder-text');
             }
@@ -1315,52 +1646,186 @@
             }
         }
 
+        // Expose functions globally for HTML attributes
         window.toggleCommentBox = toggleCommentBox;
         window.handleFocus = handleFocus;
         window.handleBlur = handleBlur;
 
+        // --- Comment Submission Logic (UPDATED) ---
         function submitComment() {
             const commentInput = document.getElementById('comment-input');
             const comment = commentInput.value.trim();
             
-            const fullPromptBlock = prompts.join("");
-            const isPlaceholder = (comment === fullPromptBlock);
+            // Check if the current text is one of the placeholders
+            const isPlaceholder = prompts.includes(comment);
 
             if (!comment || isPlaceholder) {
                 showMessageModal("Submission Failed", "Please enter a specific comment before submitting.");
                 return;
             }
 
+            const submissionId = currentPackIndex;
             const submissionPackName = currentPackTitle;
-            
-            // Form data mappings
-            const MS_FORM_URL = "https://forms.office.com/Pages/ResponsePage.aspx?id=oyzTzM4Wj0KVQTctawUZKZZTNVvNmx1PsWBXUQBSvLNUQjNHV0JEVjhaWTJENUlGTU5WNkozODNYTSQlQCNjPTEu";
-            const PARAM_PACK_NAME = "ra5e2fbef845b4084991bf2acaebed536";
-            const PARAM_COMMENT = "r86c88242a8794bbfa06c018e9fc557a5";
             
             // Encode parameters
             const encComment = encodeURIComponent(comment);
             const encName = encodeURIComponent(submissionPackName);
 
-            const fullUrl = `${MS_FORM_URL}&${PARAM_PACK_NAME}=${encName}&${PARAM_COMMENT}=${encComment}`;
+            // LIVE GOOGLE SCRIPT URL
+            const GOOGLE_FORM_URL = "https://script.google.com/macros/s/AKfycbyxQ2fjQxgxsc7cs4a1IhbMFGB5O8WxbzuUOR_Cc7WKuzaONBnzYa-Sc-WfIAxqg4/exec";
+            
+            // Construct the final URL with 3 GET parameters: id, comment, evidencePackName
+            const fullUrl = `${GOOGLE_FORM_URL}?id=${submissionId}&comment=${encComment}&evidencePackName=${encName}`;
 
+            // Update button state
             const submitBtn = document.getElementById('submit-comment-btn');
             submitBtn.textContent = 'Submitting...';
             submitBtn.disabled = true;
 
-            // Open in a new tab for MS Forms submission
-            window.open(fullUrl, '_blank');
-
-            // Reset UI
-            showMessageModal("Form Opened", "The feedback form has been opened in a new tab. Please complete your submission there.");
-            commentInput.value = ''; 
-            setRandomPlaceholder(commentInput); 
-            toggleCommentBox(); 
-            
-            submitBtn.textContent = 'Submit Feedback';
-            submitBtn.disabled = false;
+            fetch(fullUrl, {
+                method: 'GET',
+                // Use 'no-cors' for cross-domain forms/scripts (like Google Apps Script)
+                mode: 'no-cors' 
+            })
+            .then(() => {
+                // Since we use 'no-cors', we rely on the fetch succeeding rather than parsing the response.
+                showMessageModal("Success", `Your feedback has been submitted successfully!`);
+                commentInput.value = ''; 
+                setRandomPlaceholder(commentInput); // Re-apply placeholder
+            })
+            .catch(error => {
+                console.error('Submission error:', error);
+                showMessageModal("Error", "Could not submit feedback. There was a network or server issue.");
+            })
+            .finally(() => {
+                // Restore button state
+                submitBtn.textContent = 'Submit Feedback';
+                submitBtn.disabled = false;
+            });
         }
         window.submitComment = submitComment;
+
+        // --- NEW: Function to change pack via selector ---
+        // NOTE: Keeping this if needed, though menu list is preferred now
+        function changePack(index) {
+            window.location.search = `?index=${index}`;
+        }
+        window.changePack = changePack; // Expose global
+
+        // --- NEW: Function to print all packs ---
+        function printAllPacks() {
+            const bulkContainer = document.getElementById('bulk-print-container');
+            const singlePackContent = document.querySelector('.single-pack-content');
+            
+            // Prepare for bulk printing
+            document.body.classList.add('bulk-printing');
+            bulkContainer.innerHTML = ''; // Clear previous content
+
+            // Iterate over all packs and build their HTML
+            packs.forEach(pack => {
+                const packDiv = document.createElement('div');
+                packDiv.className = 'bulk-print-page-break';
+                
+                // Get all images used in this pack's text (for filtering)
+                const allUsedImages = new Set();
+                const whatRes = formatMarkdown(pack.what_text, files);
+                whatRes.usedImages.forEach(i => allUsedImages.add(i));
+                const soWhatRes = formatMarkdown(pack.so_what_text, files);
+                soWhatRes.usedImages.forEach(i => allUsedImages.add(i));
+                const qualRes = buildHtmlList(pack.qualitative_summary, 'speech-bubble', files);
+                qualRes.usedImages.forEach(i => allUsedImages.add(i));
+                const whatNowRes = formatMarkdown(pack.what_now_steps, files);
+                whatNowRes.usedImages.forEach(i => allUsedImages.add(i));
+                
+                // Build HTML content for this pack
+                // We'll reuse the helper functions but return strings instead of setting innerHTML
+                
+                // Header
+                let html = `<h1>${pack.title}</h1>`;
+                html += `
+                    <div class="pack-meta">
+                        <div class="qi-labels">
+                            <span class="qi-label qi-primary">${pack.primary_qi}</span>
+                            <span class="qi-label qi-secondary">${pack.secondary_qi || ''}</span>
+                        </div>
+                        <div class="impact-score">
+                            <strong>Self-Evaluation: ${pack.hgios_score} - ${hgiosText[pack.hgios_score]}</strong>
+                            <div class="impact-meter">${buildHgiosMeter(pack.hgios_score)}</div>
+                        </div>
+                    </div>
+                `;
+                
+                // What Section
+                html += `<section><h2>What: Our Practice & Evidence</h2>`;
+                html += `<div class="text-content">${whatRes.html}</div>`;
+                html += `<h3>Participation Summary</h3><div class="quant-grid">${buildHtmlList(pack.participation_summary, 'quant-box', files).html}</div></section>`;
+                
+                // So What Section
+                html += `<section><h2>So What: The Impact & Outcomes</h2>`;
+                html += `<div class="text-content">${soWhatRes.html}</div>`;
+                html += `<h3>Quantitative Summary (Impact)</h3><div class="quant-grid">${buildHtmlList(pack.impact_summary, 'impact-box').html}</div>`;
+                html += `<h3>Qualitative Summary</h3><div class="qual-container">${qualRes.html}</div></section>`;
+                
+                // What Now Section
+                html += `<section><h2>What Now: The Next Steps</h2>`;
+                html += `<div class="text-content">${whatNowRes.html}</div></section>`;
+                
+                // Visual Evidence (List only for print)
+                // We need to replicate the visual evidence logic here for the print list
+                // Find matching images
+                 const imageExtensions = ['.png', '.jpg', '.jpeg', '.gif', '.bmp', '.svg'];
+                 const matchingImages = files.filter(file => {
+                    const nameLower = file.Name.toLowerCase();
+                    const isImage = imageExtensions.some(ext => nameLower.endsWith(ext));
+                    const isUsed = allUsedImages.has(file.Name);
+                    return (file["Evidence Pack Name"] || "").split(/[;,]\s*/).includes(pack.title) && isImage &&
+                           (!file.ItemType || file.ItemType.toLowerCase() !== 'folder') &&
+                           !isUsed;
+                });
+                
+                if (matchingImages.length > 0) {
+                     html += `<section><h2>Visual Evidence</h2>`;
+                     matchingImages.forEach(item => {
+                         let caption = item.EvidenceDescription ? item.EvidenceDescription : item.Name;
+                         const captionHtml = marked.parse(caption, { breaks: true });
+                         const placeholderText = 'Please log in to%0ASharePoint%0Ato view image';
+                         const placeholderUrl = `https://placehold.co/600x400/f4f8fb/777?text=${placeholderText}`;
+                         const onErrorScript = `this.src='${placeholderUrl}'; this.onerror=null;`;
+                         
+                         html += `
+                            <div class="print-media-item">
+                                <img src="${item.Link}" alt="${item.Name}" class="print-media-img" onerror="${onErrorScript}">
+                                <div class="print-media-caption">${captionHtml}</div>
+                            </div>
+                        `;
+                     });
+                     html += `</section>`;
+                }
+
+                packDiv.innerHTML = html;
+                bulkContainer.appendChild(packDiv);
+            });
+
+            // Trigger print
+            window.print();
+            
+            // Clean up after print dialog closes (or user cancels)
+            // Note: window.print() blocks execution in many browsers, but not all. 
+            // A timeout or event listener (afterprint) is safer for cleanup.
+            window.onafterprint = function() {
+                 document.body.classList.remove('bulk-printing');
+                 bulkContainer.innerHTML = ''; // Clear memory
+                 window.onafterprint = null; // Remove listener
+            };
+            
+            // Fallback for browsers that don't block
+             setTimeout(() => {
+                 // We rely on CSS to hide things, so we don't strictly need to clear innerHTML immediately if the user is slow.
+                 // But cleaning up the class is important if they cancel.
+                 // Ideally, rely on onafterprint. If browser doesn't support it well, user might see bulk list briefly.
+             }, 1000);
+        }
+        window.printAllPacks = printAllPacks;
 
         function setupDraggableCommentBox() {
             const dragItem = document.getElementById('comment-box');
@@ -1432,24 +1897,30 @@
         }
 
 
+        // --- MAIN LOAD FUNCTION (Update) ---
         window.onload = function() {
             
+            // --- 1. Get Index and Store Globally ---
             let index = 0;
             try {
                 const urlParams = new URLSearchParams(window.location.search);
+                // Index is the second parameter, defaulting to 1 if not present
                 let rawIndex = urlParams.get('index');
                 if (rawIndex === null) {
+                    // Fallback to the first pack if 'index' is not in URL
                     index = packs.length > 0 ? packs[0].id : 1; 
                 } else {
                     index = parseInt(rawIndex, 10);
                 }
             } catch (e) { index = 1; }
             
-            currentPackIndex = index; 
+            currentPackIndex = index; // Store globally
             
+            // Initialize drag functionality and set initial placeholder
             setupDraggableCommentBox(); 
             setRandomPlaceholder(document.getElementById('comment-input'));
 
+            // --- 2. Load Pack Data ---
             let packData; 
             if (packs.length > 0) {
                  packData = packs.find(p => p.id === index) || packs[0];
@@ -1460,7 +1931,26 @@
             }
 
             try {
-                currentPackTitle = packData.title; 
+                currentPackTitle = packData.title; // Store globally for submission
+
+                // Populate Pack List in Menu
+                const menuList = document.getElementById('menu-pack-list');
+                if (menuList) {
+                    let menuHtml = "";
+                    packs.forEach(p => {
+                        const activeClass = (p.id === index) ? 'active' : '';
+                        const score = parseInt(p.hgios_score, 10) || 0;
+                        const scoreClass = score >= 1 && score <= 6 ? `menu-score-${score}` : 'menu-score-na';
+                        
+                        menuHtml += `
+                            <a href="#" onclick="changePack(${p.id}); return false;" class="menu-pack-item ${scoreClass} ${activeClass}">
+                                <span class="menu-pack-qi">${p.primary_qi || ''}</span>
+                                ${p.title}
+                            </a>
+                        `;
+                    });
+                    menuList.innerHTML = menuHtml;
+                }
 
                 document.title = packData.title;
                 document.getElementById('pack-title').textContent = packData.title;
@@ -1473,11 +1963,13 @@
                     document.getElementById('hgios-meter').innerHTML = buildHgiosMeter(score);
                 }
 
+                // --- Track used images ---
                 const allUsedImages = new Set();
 
                 const whatRes = formatAndSetText('what-text', packData.what_text, files);
                 whatRes.forEach(i => allUsedImages.add(i));
                 
+                // --- PARTICIPATION SUMMARY LOGIC ---
                 const partResult = buildHtmlList(packData.participation_summary, 'quant-box', files);
                 const partGrid = document.getElementById('participation-grid');
                 const partHead = document.getElementById('participation-heading');
@@ -1494,6 +1986,7 @@
                 const soWhatRes = formatAndSetText('so-what-text', packData.so_what_text, files);
                 soWhatRes.forEach(i => allUsedImages.add(i));
                 
+                // --- UPDATED: IMPACT SUMMARY LOGIC ---
                 const impResult = buildHtmlList(packData.impact_summary, 'impact-box');
                 const impGrid = document.getElementById('impact-grid');
                 const impHead = document.getElementById('impact-heading');
@@ -1507,6 +2000,7 @@
                     if (impHead) impHead.style.display = 'block';
                 }
                 
+                // --- UPDATED: QUALITATIVE SUMMARY LOGIC ---
                 const qualResult = buildHtmlList(packData.qualitative_summary, 'speech-bubble', files);
                 const qualContainer = document.getElementById('qualitative-bubbles');
                 const qualHead = document.getElementById('qualitative-heading');
@@ -1525,14 +2019,54 @@
                 const whatNowRes = formatAndSetText('what-now-text', packData.what_now_steps, files);
                 whatNowRes.forEach(i => allUsedImages.add(i));
                 
+                // --- Populate Visual Evidence (returns images used in carousel) ---
                 const visualImages = populateVisualEvidence(packData.title, files, allUsedImages);
                 if (visualImages) {
                     visualImages.forEach(i => allUsedImages.add(i));
                 }
                 
-                populateEvidenceTable(packData.title, files, allUsedImages);
+                // --- Populate Table (passing updated usedImages set) ---
+                populateEvidenceTableData(packData.title, files, allUsedImages);
 
+                // Default to Grid View
                 switchView('grid');
+                
+                // Set Up Sort Listeners (New)
+                document.querySelectorAll('th[data-column]').forEach(th => {
+                    th.addEventListener('click', () => {
+                        const column = th.dataset.column;
+                        
+                        document.querySelectorAll('th[data-column]').forEach(otherTh => {
+                            if (otherTh !== th) {
+                                otherTh.classList.remove('sort-asc', 'sort-desc');
+                            }
+                        });
+
+                        if (currentSort.column === column) {
+                            currentSort.direction = (currentSort.direction === 'asc') ? 'desc' : 'asc';
+                        } else {
+                            currentSort.column = column;
+                            currentSort.direction = 'asc';
+                        }
+                        
+                        th.classList.toggle('sort-asc', currentSort.direction === 'asc');
+                        th.classList.toggle('sort-desc', currentSort.direction === 'desc');
+
+                        sortAndRender(currentTableFiles); 
+                    });
+                    if (th.dataset.column === 'Name') {
+                        th.classList.add('sort-asc');
+                    }
+                });
+
+                // Set up search listener (New)
+                if(searchInput) {
+                    searchInput.addEventListener('input', performTableSearch);
+                }
+                if(clearButton) {
+                    clearButton.addEventListener('click', clearTableFilter);
+                }
+
 
             } catch (error) {
                 console.error("Error:", error);
