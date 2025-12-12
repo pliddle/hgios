@@ -5,15 +5,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Evidence Pack Viewer</title>
 
-    <!-- Loading both data sources -->
     <script src="tools/evidencepackdata.js"></script>
-    <script src="tools/data.js"></script> 
+    <script src="tools/data.js"></script>
 
-    <!-- Added 'marked.js' library to convert Markdown to HTML -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 
     <style>
-        /* --- Base & Typography --- */
+        /* =========================================
+           1. BASE & TYPOGRAPHY
+           ========================================= */
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
             background-color: #f9f9f9;
@@ -23,6 +23,43 @@
             padding: 0;
         }
 
+        h1 {
+            color: #1a1a1a;
+            font-size: 2.2em;
+            text-align: center;
+            border-bottom: 2px solid #005a9c;
+            padding-bottom: 10px;
+            margin-bottom: 15px;
+        }
+
+        h2 {
+            color: #005a9c;
+            font-size: 1.6em;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 8px;
+            margin-top: 40px;
+        }
+
+        h3 {
+            color: #333;
+            font-size: 1.25em;
+            margin-top: 25px;
+        }
+
+        p, ul {
+            font-size: 1.05em;
+            margin-bottom: 15px;
+        }
+
+        /* --- Rich Text Styling --- */
+        .text-content p { margin-top: 0; margin-bottom: 1em; }
+        .text-content ul, .text-content ol { margin-bottom: 1em; padding-left: 30px; }
+        .text-content li { margin-bottom: 0.5em; }
+
+
+        /* =========================================
+           2. LAYOUT & CONTAINERS
+           ========================================= */
         .container {
             max-width: 900px;
             margin: 20px auto;
@@ -32,11 +69,30 @@
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
         }
 
+        section {
+            margin-bottom: 30px;
+        }
+
+        /* --- Header --- */
+        .header-container {
+            padding-bottom: 10px;
+            border-bottom: 2px solid #ccc;
+            margin-bottom: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: relative;
+        }
+        .header-container img {
+            height: 60px;
+            width: auto;
+        }
+
         /* --- Error Banner --- */
         #error-banner {
-            display: none; 
+            display: none;
             padding: 15px;
-            background-color: #d9534f; 
+            background-color: #d9534f;
             color: white;
             font-weight: bold;
             border-radius: 8px;
@@ -44,22 +100,10 @@
             text-align: center;
         }
 
-        /* --- Header Styling (Matched with Index) --- */
-        .header-container {
-            padding-bottom: 10px;
-            border-bottom: 2px solid #ccc; /* Updated to match index */
-            margin-bottom: 10px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            position: relative; 
-        }
-        .header-container img {
-            height: 60px;
-            width: auto; 
-        }
-        
-        /* --- Menu Button --- */
+
+        /* =========================================
+           3. NAVIGATION & MENUS
+           ========================================= */
         #menu-toggle-btn {
             background: none;
             border: none;
@@ -74,11 +118,11 @@
             background-color: #f0f0f0;
         }
 
-        /* --- Settings Menu (Sidebar) --- */
+        /* --- Settings Sidebar --- */
         #settings-menu {
             position: fixed;
             top: 0;
-            right: -320px; 
+            right: -320px;
             width: 320px;
             height: 100vh;
             background-color: #ffffff;
@@ -93,8 +137,7 @@
         #settings-menu.open {
             right: 0;
         }
-        
-        /* Menu Overlay (Click to close) */
+
         #menu-overlay {
             position: fixed;
             top: 0;
@@ -129,14 +172,13 @@
             color: #555;
         }
 
-        /* Menu Pack List */
         .menu-scroll-area {
             flex-grow: 1;
             overflow-y: auto;
             margin-bottom: 20px;
-            padding-right: 5px; 
+            padding-right: 5px;
         }
-        
+
         .menu-pack-item {
             display: block;
             background-color: #f9f9f9;
@@ -159,7 +201,7 @@
             border-left-width: 6px;
             font-weight: 600;
         }
-        
+
         .menu-pack-qi {
             display: block;
             font-size: 0.85em;
@@ -167,57 +209,18 @@
             margin-bottom: 2px;
         }
 
-        /* Menu Actions (Print Buttons) */
         .menu-actions {
             border-top: 2px solid #eee;
             padding-top: 15px;
         }
 
-        h1 {
-            color: #1a1a1a;
-            font-size: 2.2em;
-            text-align: center;
-            border-bottom: 2px solid #005a9c; 
-            padding-bottom: 10px;
-            margin-bottom: 15px;
-        }
 
-        h2 {
-            color: #005a9c; 
-            font-size: 1.6em;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 8px;
-            margin-top: 40px;
-        }
-        
-        h3 {
-            color: #333;
-            font-size: 1.25em;
-            margin-top: 25px;
-        }
-
-        p, ul {
-            font-size: 1.05em;
-            margin-bottom: 15px;
-        }
-        
-        /* --- Rich text content styling --- */
-        .text-content p {
-            margin-top: 0;
-            margin-bottom: 1em;
-        }
-        .text-content ul, .text-content ol {
-            margin-bottom: 1em;
-            padding-left: 30px;
-        }
-        .text-content li {
-            margin-bottom: 0.5em;
-        }
-
-        /* --- Metadata Header --- */
+        /* =========================================
+           4. PACK METADATA & RATINGS
+           ========================================= */
         .pack-meta {
             display: flex;
-            flex-wrap: wrap; 
+            flex-wrap: wrap;
             justify-content: space-between;
             align-items: center;
             gap: 20px;
@@ -228,44 +231,33 @@
             margin-bottom: 30px;
         }
 
-        /* --- QI Labels (HGIOS Colours) --- */
+        /* --- QI Labels --- */
         .qi-labels {
-            flex: 2; 
+            flex: 2;
             min-width: 300px;
         }
-
         .qi-label {
             display: inline-block;
             padding: 8px 15px;
-            border-radius: 20px; 
+            border-radius: 20px;
             font-size: 0.9em;
             font-weight: bold;
             color: #fff;
             margin-right: 10px;
-            margin-bottom: 5px; 
+            margin-bottom: 5px;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
-        
-        .qi-label:empty {
-            display: none;
-        }
+        .qi-label:empty { display: none; }
+        .qi-primary { background-color: #005a9c; }
+        .qi-secondary { background-color: #008a00; }
 
-        .qi-primary {
-            background-color: #005a9c; 
-        }
-
-        .qi-secondary {
-            background-color: #008a00; 
-        }
-
-        /* --- HGIOS 6-Point Scale --- */
+        /* --- HGIOS Impact Score --- */
         .impact-score {
             flex: 1;
-            min-width: 220px; 
+            min-width: 220px;
             text-align: right;
         }
-        
         .impact-score strong {
             display: block;
             font-size: 0.9em;
@@ -274,30 +266,28 @@
             text-transform: uppercase;
             font-weight: bold;
         }
-
         .impact-meter {
             display: flex;
             gap: 5px;
-            justify-content: flex-end; 
+            justify-content: flex-end;
         }
-
         .impact-block {
-            width: 30px; 
+            width: 30px;
             height: 15px;
             border-radius: 3px;
-            background-color: #e0e0e0; 
+            background-color: #e0e0e0;
             border: 1px solid #ccc;
         }
 
-        /* HGIOS Progressive Grade Colours */
-        .hgios-1-unsatisfactory { background-color: #d9534f; border-color: #b0413e; } 
-        .hgios-2-weak { background-color: #E67E22; border-color: #C0392B; } 
-        .hgios-3-satisfactory { background-color: #f7d94c; border-color: #c08a3e; } 
-        .hgios-4-good { background-color: #5cb85c; border-color: #4a944a; } 
-        .hgios-5-verygood { background-color: #008a00; border-color: #006b00; } 
-        .hgios-6-excellent { background-color: #005a9c; border-color: #004475; } 
+        /* Grade Colours */
+        .hgios-1-unsatisfactory { background-color: #d9534f; border-color: #b0413e; }
+        .hgios-2-weak { background-color: #E67E22; border-color: #C0392B; }
+        .hgios-3-satisfactory { background-color: #f7d94c; border-color: #c08a3e; }
+        .hgios-4-good { background-color: #5cb85c; border-color: #4a944a; }
+        .hgios-5-verygood { background-color: #008a00; border-color: #006b00; }
+        .hgios-6-excellent { background-color: #005a9c; border-color: #004475; }
 
-        /* CSS Classes for Menu Items */
+        /* Menu Item Score Indicators */
         .menu-score-6 { border-left-color: #005a9c; }
         .menu-score-5 { border-left-color: #008a00; }
         .menu-score-4 { border-left-color: #5cb85c; }
@@ -306,22 +296,20 @@
         .menu-score-1 { border-left-color: #d9534f; }
         .menu-score-na { border-left-color: #999; }
 
-        /* --- Section Styling --- */
-        section {
-            margin-bottom: 30px;
-        }
 
-        /* --- Quantitative Boxes --- */
+        /* =========================================
+           5. CONTENT WIDGETS
+           ========================================= */
+        /* --- Quantitative Grids --- */
         .quant-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 20px;
             margin-top: 20px;
-            align-items: stretch; /* Ensure boxes stretch to match height in row */
+            align-items: stretch;
         }
-
         .quant-box {
-            background-color: #005a9c; 
+            background-color: #005a9c;
             color: #ffffff;
             padding: 20px;
             border-radius: 10px;
@@ -329,35 +317,30 @@
             font-size: 1.1em;
             font-weight: bold;
             box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-            /* Ensure content doesn't overflow */
             word-wrap: break-word;
-            /* Vertical gap fix if grid falls back to block */
-            margin-bottom: 0; 
+            margin-bottom: 0;
         }
-        
         .impact-box {
-            background-color: #008a00; 
+            background-color: #008a00;
         }
-        
-        /* Qualitative Speech Bubbles */
+
+        /* --- Qualitative Speech Bubbles --- */
         .qual-container {
             margin-top: 20px;
             display: flex;
             flex-direction: column;
-            gap: 15px; /* Add explicit gap between bubbles */
+            gap: 15px;
         }
-
         .speech-bubble {
-            background: #f4f8fb; 
-            border-left: 5px solid #005a9c; 
+            background: #f4f8fb;
+            border-left: 5px solid #005a9c;
             padding: 15px 20px;
-            margin-bottom: 0; /* Remove bottom margin, use container gap instead */
+            margin-bottom: 0;
             border-radius: 0 5px 5px 0;
             font-style: italic;
             font-size: 1.05em;
             position: relative;
         }
-
         .speech-bubble::before {
             content: '“';
             font-size: 3em;
@@ -367,8 +350,8 @@
             top: -10px;
             left: 5px;
         }
-        
-        /* --- Embedded Media Styling --- */
+
+        /* --- Embedded Media --- */
         .embedded-media-container {
             margin: 25px auto;
             max-width: 90%;
@@ -376,8 +359,8 @@
             border-radius: 8px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
             background: #fdfdfd;
-            overflow: hidden; 
-            cursor: pointer; /* Indicate clickability */
+            overflow: hidden;
+            cursor: pointer;
         }
         .embedded-media-img {
             width: 100%;
@@ -400,15 +383,117 @@
             border-top: 1px solid #eee;
         }
         .embedded-media-container p:last-child {
-            margin-bottom: 0; 
+            margin-bottom: 0;
         }
 
-        /* --- VISUAL EVIDENCE STYLING (Grid & Carousel) --- */
+
+        /* =========================================
+           6. VISUAL EVIDENCE (VIDEO & IMAGES)
+           ========================================= */
         #visual-evidence {
-            display: none; 
+            display: none;
         }
 
-        /* View Mode Toggle */
+        /* --- Video Gallery Styles --- */
+        .video-gallery-container {
+            display: none; /* Hidden unless videos exist */
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 30px;
+            background: #111;
+            padding: 20px;
+            border-radius: 8px;
+            color: #fff;
+        }
+
+        .main-video-wrapper {
+            flex: 3;
+            min-width: 300px;
+        }
+
+        .main-video-player {
+            width: 100%;
+            height: auto;
+            aspect-ratio: 16 / 9;
+            background: #000;
+            border-radius: 4px;
+            display: block;
+        }
+
+        .video-info {
+            padding-top: 15px;
+        }
+        .video-info h4 {
+            margin: 0;
+            color: #fff;
+            font-size: 1.1em;
+        }
+        .video-info p {
+            margin: 5px 0 0;
+            color: #ccc;
+            font-size: 0.9em;
+        }
+
+        .video-sidebar {
+            flex: 1;
+            min-width: 250px;
+            max-height: 400px; /* Adjust to match main video height approx */
+            overflow-y: auto;
+            background: #222;
+            border-radius: 4px;
+        }
+
+        .video-sidebar-item {
+            display: flex;
+            gap: 10px;
+            padding: 10px;
+            cursor: pointer;
+            border-bottom: 1px solid #333;
+            transition: background 0.2s;
+        }
+        .video-sidebar-item:hover {
+            background: #333;
+        }
+        .video-sidebar-item.active-video {
+            background: #005a9c;
+        }
+
+        .video-sidebar-thumb {
+            width: 70px;
+            height: 40px;
+            background: #444;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            color: #aaa;
+            border-radius: 2px;
+            flex-shrink: 0;
+        }
+        .video-sidebar-text {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            overflow: hidden;
+        }
+        .video-sidebar-title {
+            font-weight: bold;
+            font-size: 0.85em;
+            color: #eee;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .video-sidebar-desc {
+            font-size: 0.75em;
+            color: #999;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* --- Image Grid/Carousel Styles --- */
         .view-mode-controls {
             display: flex;
             justify-content: flex-end;
@@ -437,7 +522,7 @@
             margin-top: 20px;
         }
         .visual-card {
-            display: flex; /* Use flex to arrange content vertically */
+            display: flex;
             flex-direction: column;
             background-color: #fff;
             border: 1px solid #eee;
@@ -446,24 +531,20 @@
             color: #333;
             font-weight: 500;
             transition: all 0.2s ease;
-            overflow: hidden; 
+            overflow: hidden;
             cursor: pointer;
         }
         .visual-card:hover {
             border-color: #005a9c;
             box-shadow: 0 4px 5px rgba(0,0,0,0.1);
         }
-        
-        /* NEW: Wrapper for the image to hold the click handler */
         .visual-card-image-wrapper {
             width: 100%;
-            height: 150px; 
+            height: 150px;
             cursor: pointer;
             overflow: hidden;
             display: block;
         }
-        
-        /* Image now fills its wrapper */
         .visual-card-img {
             width: 100%;
             height: 100%;
@@ -474,14 +555,12 @@
             font-size: 12px;
             text-align: center;
         }
-        
-        /* Caption visibility in Grid View */
         .visual-card-title {
             display: block;
             padding: 10px 15px;
             font-size: 0.9em;
             font-weight: 500;
-            text-align: left; 
+            text-align: left;
             background-color: #fdfdfd;
             border-top: 1px solid #eee;
             white-space: normal;
@@ -489,19 +568,12 @@
             text-overflow: clip;
             flex-grow: 1;
         }
-        
-        /* Styles for content inside the caption (if it contains HTML from Markdown) */
-        .visual-card-title > p:first-child {
-            margin-top: 0;
-        }
-        .visual-card-title > p:last-child {
-            margin-bottom: 0;
-        }
-
+        .visual-card-title > p:first-child { margin-top: 0; }
+        .visual-card-title > p:last-child { margin-bottom: 0; }
 
         /* Carousel View */
         .visual-carousel {
-            display: none; /* Hidden by default */
+            display: none;
             position: relative;
             background: #f0f0f0;
             border-radius: 8px;
@@ -555,17 +627,11 @@
             font-weight: bold;
         }
 
-        /* --- Print-Friendly List View (Hidden on Screen) --- */
-        #visual-evidence-print-list {
-            display: none; /* Hidden on screen */
-        }
-        
-        /* --- Bulk Print Container (Hidden on Screen) --- */
-        #bulk-print-container {
-            display: none;
-        }
 
-        /* --- COMMENT BOX & RESTORE TAB CSS --- */
+        /* =========================================
+           7. INTERACTIVE COMPONENTS (Modals, Forms)
+           ========================================= */
+        /* --- Comment Box --- */
         #comment-box {
             position: fixed;
             bottom: 20px;
@@ -576,41 +642,37 @@
             border-radius: 10px;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
             z-index: 1001;
-            cursor: grab; 
+            cursor: grab;
             padding: 15px;
-            display: none; /* Start Minimized */
+            display: none;
             flex-direction: column;
-            transition: box-shadow 0.2s; 
+            transition: box-shadow 0.2s;
         }
-        
         #comment-box:active {
             box-shadow: 0 6px 16px rgba(0, 0, 0, 0.3);
             cursor: grabbing;
         }
-
         #comment-box h3 {
             margin-top: 0;
             margin-bottom: 10px;
             color: #005a9c;
             font-size: 1.1em;
-            cursor: move; 
+            cursor: move;
             user-select: none;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
-
         .minimize-btn {
-            background: none; 
-            border: none; 
-            cursor: pointer; 
-            color: #005a9c; 
-            font-size: 1.5rem; 
+            background: none;
+            border: none;
+            cursor: pointer;
+            color: #005a9c;
+            font-size: 1.5rem;
             line-height: 1;
             padding: 0;
             margin-left: 10px;
         }
-
         #comment-input {
             width: 100%;
             min-height: 100px;
@@ -623,11 +685,7 @@
             font-family: inherit;
             color: #333;
         }
-
-        .placeholder-text {
-            color: #999 !important;
-        }
-        
+        .placeholder-text { color: #999 !important; }
         #submit-comment-btn {
             background-color: #008a00;
             color: white;
@@ -638,18 +696,16 @@
             font-weight: bold;
             transition: background-color 0.2s;
         }
-
         #submit-comment-btn:hover {
             background-color: #006b00;
         }
-        
         #restore-tab {
             position: fixed;
             right: 0;
             top: 50%;
             transform: translateY(-50%);
             z-index: 1002;
-            display: block; /* Start Visible */
+            display: block;
         }
         #restore-tab button {
             background-color: #005a9c;
@@ -663,22 +719,20 @@
             font-size: 1em;
             line-height: 1;
         }
-        
-        /* --- Image Viewer Modal (Lightbox) --- */
+
+        /* --- Modals --- */
         .modal {
-            display: none; 
-            position: fixed; 
-            z-index: 1000; 
-            padding-top: 50px; 
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            padding-top: 50px;
             left: 0;
             top: 0;
-            width: 100%; 
-            height: 100%; 
-            overflow: auto; 
-            background-color: rgb(0,0,0); 
-            background-color: rgba(0,0,0,0.9); 
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.9);
         }
-
         .modal-content {
             margin: auto;
             display: block;
@@ -688,7 +742,6 @@
             object-fit: contain;
             background-color: white;
         }
-
         .modal-caption {
             margin: auto;
             display: block;
@@ -699,7 +752,6 @@
             padding: 10px 0;
             height: 150px;
         }
-
         .close-modal {
             position: absolute;
             top: 15px;
@@ -710,24 +762,21 @@
             transition: 0.3s;
             cursor: pointer;
         }
-
-        .close-modal:hover,
-        .close-modal:focus {
+        .close-modal:hover, .close-modal:focus {
             color: #bbb;
             text-decoration: none;
             cursor: pointer;
         }
-        
-        /* Message Modal Styling (uses .modal base) */
+
+        /* Message Modal */
         #message-modal .modal-content {
             margin: 15% auto;
-            max-width: 400px; 
-            padding: 20px; 
-            background-color: white; 
+            max-width: 400px;
+            padding: 20px;
+            background-color: white;
             border-radius: 8px;
             text-align: left;
         }
-        
         #message-modal .close-modal {
             position: absolute;
             top: 10px;
@@ -736,11 +785,9 @@
             font-size: 28px;
             cursor: pointer;
         }
-        #message-modal .close-modal:hover {
-            color: #000;
-        }
+        #message-modal .close-modal:hover { color: #000; }
 
-        /* --- Print Button --- */
+        /* --- Print Buttons --- */
         .print-buttons-container {
             display: flex;
             gap: 15px;
@@ -759,94 +806,146 @@
             border: none;
             border-radius: 8px;
             cursor: pointer;
-            margin-bottom: 10px; /* space between buttons */
+            margin-bottom: 10px;
         }
-        .print-button:hover {
-            background-color: #004475;
-        }
-        .bulk-print-button {
-             background-color: #555;
-        }
-        .bulk-print-button:hover {
-             background-color: #333;
-        }
+        .print-button:hover { background-color: #004475; }
+        .bulk-print-button { background-color: #555; }
+        .bulk-print-button:hover { background-color: #333; }
         
-        /* --- Evidence Table Styles (Copied & Adapted from Index) --- */
+        /* --- Search & Filtering --- */
+        .search-container {
+            margin-bottom: 15px;
+            background-color: #f4f8fb;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #eee;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 10px;
+            max-width: 100%;
+        }
+
+        #searchInput {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 1em;
+            color: #333;
+        }
+
+        #clearButton {
+            padding: 10px 20px;
+            background-color: #666; 
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+        #clearButton:hover {
+            background-color: #444;
+        }
+
+
+        /* =========================================
+           8. DATA TABLES
+           ========================================= */
         .evidence-table-container {
             overflow-x: auto;
-            background-color: #fff; 
-            padding: 15px; 
-            border-radius: 8px; 
-            box-shadow: 0 2px 8px rgba(0,0,0,0.05); 
+            background-color: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
         }
-        
         .evidence-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 13px; 
-            margin-top: 0; 
+            font-size: 13px;
+            margin-top: 0;
         }
         .evidence-table th, .evidence-table td {
-            padding: 8px 10px; 
+            padding: 8px 10px;
             text-align: left;
             border-bottom: 1px solid #ddd;
             word-break: break-word;
             vertical-align: top;
         }
-        
-        /* Grey Header Background (Matched from Index) */
         .evidence-table th {
             background-color: #f9f9f9;
             font-weight: 600;
             color: #333;
         }
-        
-        .evidence-table tr:hover {
-            background-color: #f4f8fb;
-        }
-        
+        .evidence-table tr:hover { background-color: #f4f8fb; }
         .evidence-table td a {
             font-weight: 600;
             color: #005a9c;
             text-decoration: none;
         }
-        .evidence-table td a:hover {
-            text-decoration: underline;
-        }
-        
-        /* Column widths (Matched from Index) */
+        .evidence-table td a:hover { text-decoration: underline; }
+
+        /* Column widths */
         .evidence-table th:nth-child(1) { width: 25%; } /* Name */
         .evidence-table th:nth-child(2) { width: 10%; } /* QIs */
         .evidence-table th:nth-child(3) { width: 15%; } /* Tags */
         .evidence-table th:nth-child(4) { width: 30%; } /* Description */
         .evidence-table th:nth-child(5) { width: 10%; } /* Session */
         .evidence-table th:nth-child(6) { width: 10%; } /* Status */
-        
-        /* --- NEW: Table QI Label Style (Copied from Index) --- */
+
         .table-qi-label {
             display: inline-block;
-            padding: 2px 6px; 
-            font-size: 11px; 
+            padding: 2px 6px;
+            font-size: 11px;
             font-weight: bold;
             color: #fff;
-            background-color: #005a9c; /* Blue Button Style */
-            border-radius: 10px; /* Rounded corners */
-            margin-bottom: 3px; 
+            background-color: #005a9c;
+            border-radius: 10px;
+            margin-bottom: 3px;
             margin-right: 3px;
-            cursor: default; 
+            cursor: default;
             white-space: nowrap;
         }
 
+        /* Sortable Headers */
+        th[data-column] {
+            cursor: pointer;
+            position: relative;
+            padding-right: 20px;
+        }
+        th[data-column]::after {
+            content: '';
+            position: absolute;
+            right: 8px;
+            top: 50%;
+            transform: translateY(-50%);
+            opacity: 0.3;
+            width: 0;
+            height: 0;
+            border-left: 5px solid transparent;
+            border-right: 5px solid transparent;
+        }
+        th.sort-asc::after {
+            opacity: 1;
+            border-bottom: 5px solid #333;
+        }
+        th.sort-desc::after {
+            opacity: 1;
+            border-top: 5px solid #333;
+        }
 
-        /* ==================================== */
-        /* === PRINT MEDIA STYLES (REQUIRED) === */
-        /* ==================================== */
+
+        /* =========================================
+           9. PRINT STYLES
+           ========================================= */
+        #visual-evidence-print-list, #bulk-print-container {
+            display: none;
+        }
+
         @media print {
-            /* 1. Page Numbering */
             @page {
-                /* Set standard margins */
                 margin: 1cm;
-                /* Define the content for the bottom right corner (page X of Y) */
                 @bottom-right {
                     content: "Page " counter(page) " of " counter(pages);
                     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
@@ -855,49 +954,28 @@
                 }
             }
 
-            /* 2. Hide Non-Print Elements */
-            /* Crucial: Hide the new menu, but allow print actions via JS logic */
-            #settings-menu, #menu-overlay, #menu-toggle-btn, #comment-box, #restore-tab, .search-container {
-                display: none !important; 
+            /* Hide interactive elements */
+            #settings-menu, #menu-overlay, #menu-toggle-btn, #comment-box, #restore-tab, .search-container,
+            .header-container, #error-banner, .view-mode-controls, .modal, .visual-grid, .visual-carousel, #evidence,
+            #video-gallery {
+                display: none !important;
             }
-            .header-container, #error-banner, .view-mode-controls, .modal {
-                display: none;
-            }
-            
-            /* 3. General Print Layout Resets */
-            body {
+
+            /* Resets */
+            body, .container {
                 background-color: #fff;
                 box-shadow: none;
                 margin: 0;
                 padding: 0;
-            }
-            .container {
-                box-shadow: none;
-                margin: 0;
                 max-width: 100%;
-                padding: 0; /* Important for full page usage */
             }
 
-            /* 4. Content Visibility Switch */
-            .visual-grid, .visual-carousel { 
-                display: none !important; 
-            }
-            /* Hide the evidence list table */
-            #evidence {
-                display: none !important; /* Hide the table view for print */
-            }
-            /* Show the print-friendly list */
-            #visual-evidence-print-list {
-                display: block !important; /* Show the print-friendly list */
-            }
-            
-            /* 5. Break Avoidance and Media Styling */
-            .embedded-media-iframe {
-                display: none; /* Hide embedded non-static media */
-            }
-            .embedded-media-container {
-                page-break-inside: avoid;
-            }
+            /* Print Content */
+            #visual-evidence-print-list { display: block !important; }
+
+            .embedded-media-iframe { display: none; }
+            .embedded-media-container { page-break-inside: avoid; }
+
             .print-media-item {
                 margin-bottom: 30px;
                 page-break-inside: avoid;
@@ -915,64 +993,25 @@
                 text-align: center;
                 color: #333;
             }
-            
-            /* 6. Bulk Print Specifics */
-            .bulk-print-page-break {
-                page-break-after: always;
-            }
-            /* If bulk printing, hide the main single-pack container content to avoid duplicates/confusion */
-            /* We toggle a class on body to control this */
-            body.bulk-printing .single-pack-content {
-                display: none;
-            }
-            body.bulk-printing #bulk-print-container {
-                display: block;
-            }
-        }
-        
-        /* --- Sortable Header Styles --- */
-        th[data-column] {
-            cursor: pointer;
-            position: relative;
-            padding-right: 20px; 
-        }
-        th[data-column]::after {
-            content: '';
-            position: absolute;
-            right: 8px;
-            top: 50%;
-            transform: translateY(-50%);
-            opacity: 0.3;
-            width: 0; 
-            height: 0;
-            border-left: 5px solid transparent;
-            border-right: 5px solid transparent;
-        }
-        th.sort-asc::after {
-            opacity: 1;
-            border-bottom: 5px solid #333;
-        }
-        th.sort-desc::after {
-            opacity: 1;
-            border-top: 5px solid #333;
-        }
 
+            /* Bulk Print */
+            .bulk-print-page-break { page-break-after: always; }
+            body.bulk-printing .single-pack-content { display: none; }
+            body.bulk-printing #bulk-print-container { display: block; }
+        }
     </style>
 </head>
 <body>
 
-    <!-- OVERLAY for Menu -->
     <div id="menu-overlay" onclick="toggleMenu()"></div>
 
-    <!-- SETTINGS MENU -->
     <div id="settings-menu">
         <div class="menu-header">
             <h3>Evidence Packs</h3>
             <button class="close-menu-btn" onclick="toggleMenu()">&times;</button>
         </div>
         <div id="menu-pack-list" class="menu-scroll-area">
-            <!-- List populated by JS -->
-        </div>
+            </div>
         <div class="menu-actions">
             <button class="print-button" onclick="window.print()">Print This Pack</button>
             <button class="print-button bulk-print-button" onclick="printAllPacks()">Print All Packs</button>
@@ -980,114 +1019,94 @@
     </div>
 
     <div class="container">
-        
-        <!-- ERROR BANNER -->
+
         <div id="error-banner"></div>
 
-        <!-- HEADER -->
         <div class="header-container">
-            <img src="image/badge.png" alt="School Logo" class="header-image" onerror="this.src='https://placehold.co/150x60/eee/ccc?text=School+Logo'" >
-            <div style="flex-grow: 1;"></div> <!-- Spacer -->
+            <img src="image/badge.png" alt="School Logo" class="header-image" onerror="this.src='https://placehold.co/150x60/eee/ccc?text=School+Logo'">
+            <div style="flex-grow: 1;"></div>
             <img src="image/values.png" alt="Council Logo" class="header-image" onerror="this.src='https://placehold.co/150x60/eee/ccc?text=Council+Logo'">
             <button id="menu-toggle-btn" onclick="toggleMenu()">&#9776;</button>
         </div>
-        
-        <!-- SINGLE PACK CONTENT WRAPPER -->
+
         <div class="single-pack-content">
 
-            <!-- TITLE & META -->
             <h1 id="pack-title">Loading...</h1>
-    
+
             <div class="pack-meta">
-                <div class="qi-labels">
-                    <span class="qi-label qi-primary" id="primary-qi"></span>
-                    <span class="qi-label qi-secondary" id="secondary-qi"></span>
-                </div>
+                <div class="qi-labels" id="pack-qis"></div>
                 <div class="impact-score">
-                    <strong id="hgios-rating-text"></strong>
-                    <div class="impact-meter" id="hgios-meter">
-                        <!-- This will be generated by JavaScript -->
-                    </div>
+                    <strong id="impact-label">Impact Score: N/A</strong>
+                    <div class="impact-meter" id="impact-meter"></div>
                 </div>
             </div>
-            
-            <!-- VISUAL EVIDENCE -->
+
             <section id="visual-evidence">
                 <h2>Visual Evidence</h2>
                 
-                <!-- Mode Switcher -->
+                <div id="video-gallery" class="video-gallery-container">
+                    <div class="main-video-wrapper">
+                        <video id="main-video-player" class="main-video-player" controls>
+                            <source id="main-video-source" src="" type="video/mp4">
+                            Your browser does not support the video tag.
+                        </video>
+                        <div class="video-info">
+                            <h4 id="main-video-title">Select a video</h4>
+                            <p id="main-video-desc"></p>
+                        </div>
+                    </div>
+                    <div class="video-sidebar" id="video-sidebar-list">
+                        </div>
+                </div>
+
                 <div class="view-mode-controls">
                     <button class="view-mode-btn active" id="btn-grid-view" onclick="switchView('grid')">Grid View</button>
                     <button class="view-mode-btn" id="btn-carousel-view" onclick="switchView('carousel')">Carousel View</button>
                 </div>
-    
-                <!-- Grid View (Screen) -->
                 <div class="visual-grid" id="visual-evidence-grid"></div>
-    
-                <!-- Carousel View (Screen) -->
                 <div class="visual-carousel" id="visual-evidence-carousel">
-                    <div id="carousel-slides-container">
-                        <!-- Slides injected here -->
-                    </div>
+                    <div id="carousel-slides-container"></div>
                     <div class="carousel-controls">
                         <button class="carousel-btn" onclick="moveCarousel(-1)">Previous</button>
                         <span class="carousel-counter" id="carousel-counter">1 of 5</span>
                         <button class="carousel-btn" onclick="moveCarousel(1)">Next</button>
                     </div>
                 </div>
-                
-                <!-- Print List View (Hidden on Screen) -->
-                <div id="visual-evidence-print-list">
-                    <!-- List items injected here -->
-                </div>
+                <div id="visual-evidence-print-list"></div>
             </section>
-    
-            <!-- WHAT -->
+
             <section id="what">
                 <h2>What: Our Practice & Evidence</h2>
-                <div id="what-text" class="text-content"></div> 
-                
-                <!-- Updated heading ID for JS control -->
+                <div id="what-text" class="text-content"></div>
                 <h3 id="participation-heading">Participation Summary</h3>
                 <div class="quant-grid" id="participation-grid"></div>
             </section>
-    
-            <!-- SO WHAT -->
+
             <section id="so-what">
                 <h2>So What: The Impact & Outcomes</h2>
                 <div id="so-what-text" class="text-content"></div>
-                
-                <!-- UPDATED: Added ID for JS control -->
                 <h3 id="impact-heading">Quantitative Summary (Impact)</h3>
                 <div class="quant-grid" id="impact-grid"></div>
-                
-                <!-- UPDATED: Added ID for JS control -->
                 <h3 id="qualitative-heading">Qualitative Summary</h3>
                 <div class="qual-container" id="qualitative-bubbles"></div>
             </section>
-    
-            <!-- WHAT NOW -->
+
             <section id="what-now">
                 <h2>What Now: The Next Steps</h2>
                 <div id="what-now-text" class="text-content"></div>
             </section>
-    
-            <!-- COLLATED EVIDENCE TABLE -->
+
             <section id="evidence">
                 <h2>Collated Evidence Files</h2>
                 <p>The following files from the Evidence Library are tagged with this Evidence Pack:</p>
-                
-                <!-- NEW SEARCH CONTAINER FOR TABLE -->
                 <div class="search-container">
                     <div class="filter-grid">
                         <div class="search-box">
                             <input type="text" id="searchInput" placeholder="Search files...">
                             <button id="clearButton" class="control-button">Clear</button>
                         </div>
-                        <!-- Filters could be added here if needed, but keeping it simple for now -->
                     </div>
                 </div>
-
                 <div class="evidence-table-container">
                     <table class="evidence-table">
                         <thead>
@@ -1101,92 +1120,76 @@
                             </tr>
                         </thead>
                         <tbody id="pack-evidence-table-body">
-                            <!-- Populated by JS -->
-                        </tbody>
+                            </tbody>
                     </table>
                 </div>
             </section>
-        
-        </div>
-        <!-- END SINGLE PACK CONTENT -->
-        
-        <!-- BULK PRINT CONTAINER (Hidden until print) -->
-        <div id="bulk-print-container"></div>
-        
+
+        </div> <div id="bulk-print-container"></div>
+
     </div>
 
-    <!-- IMAGE VIEWER MODAL -->
     <div id="image-modal" class="modal">
         <span class="close-modal" onclick="closeModal()">&times;</span>
-        <img class="modal-content" id="modal-image">
-        <div class="modal-caption" id="modal-caption"></div>
+        <img class="modal-content" id="modal-img">
+        <div id="modal-caption" class="modal-caption"></div>
     </div>
-    
-    <!-- NEW: MESSAGE MODAL (For Custom Alerts) -->
+
     <div id="message-modal" class="modal">
         <div class="modal-content">
             <span class="close-modal" onclick="closeMessageModal()">&times;</span>
-            <h3 id="message-title" style="margin-top: 0; color: #005a9c;"></h3>
+            <h3 id="message-title"></h3>
             <p id="message-body"></p>
-            <button onclick="closeMessageModal()" style="background-color: #005a9c; color: white; padding: 10px 15px; border: none; border-radius: 6px; margin-top: 10px; width: 100%;">Close</button>
         </div>
     </div>
-    
-    <!-- NEW: RESTORE TAB (Initially hidden) -->
-    <div id="restore-tab">
-        <button onclick="toggleCommentBox()" title="Restore Feedback Box">
-             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="transform: rotate(-90deg); display: inline-block; vertical-align: middle; margin-right: 5px;"><polyline points="15 17 20 12 15 7"></polyline><polyline points="4 17 9 12 4 7"></polyline></svg>
-            Feedback
-        </button>
+
+    <div id="restore-tab" style="display: none;">
+        <button onclick="toggleCommentBox()">Feedback &laquo;</button>
     </div>
 
-
-    <!-- NEW: COMMENT BOX (Initially hidden in CSS) -->
     <div id="comment-box">
-        <!-- The h3 element acts as the drag handle -->
-        <h3>Feedback & Comments
-            <button class="minimize-btn" onclick="toggleCommentBox()">&times;</button>
-        </h3>
-        <textarea id="comment-input" 
-            placeholder="Enter your detailed feedback here..."
-            onfocus="handleFocus(this)"
-            onblur="handleBlur(this)"></textarea>
+        <h3>Feedback & Comments <button class="minimize-btn" onclick="toggleCommentBox()">&times;</button></h3>
+        <textarea id="comment-input" placeholder="Enter your detailed feedback here..." onfocus="handleFocus(this)" onblur="handleBlur(this)"></textarea>
         <button id="submit-comment-btn" onclick="submitComment()">Submit Feedback</button>
     </div>
 
-    <!-- JAVASCRIPT LOGIC -->
     <script>
-        // --- Global State ---
+        // =========================================
+        // 1. GLOBAL STATE & CONFIG
+        // =========================================
         let currentSlideIndex = 0;
         let totalSlides = 0;
-        let currentPackIndex = 0; // Global variable for the current pack index
-        let currentPackTitle = ""; // Global variable for the current pack title
-        let currentTableFiles = []; // Store files for current pack for searching/sorting
-        let currentSort = { column: 'Name', direction: 'asc' }; // For table sorting
-        
-        // --- DATA LOADING & INITIALIZATION ---
+        let currentPackIndex = 0;
+        let currentPackTitle = "";
+        let currentTableFiles = [];
+        let currentSort = { column: 'Name', direction: 'asc' };
+        let currentVideos = []; // Store videos for the player
+
+        // Data Loading
         const files = (typeof myFiles !== 'undefined') ? myFiles : [];
         const packs = (typeof evidencePacks !== 'undefined') ? evidencePacks : [];
 
+        // HGIOS Configuration
         const hgiosText = { 1: "Unsatisfactory", 2: "Weak", 3: "Satisfactory", 4: "Good", 5: "Very Good", 6: "Excellent" };
         const hgiosClasses = ["hgios-1-unsatisfactory", "hgios-2-weak", "hgios-3-satisfactory", "hgios-4-good", "hgios-5-verygood", "hgios-6-excellent"];
 
-        // --- HELPER FUNCTIONS ---
-        
-        // Message Box Functions
+
+        // =========================================
+        // 2. HELPER FUNCTIONS
+        // =========================================
+
         function showMessageModal(title, body) {
             const modal = document.getElementById('message-modal');
             document.getElementById('message-title').textContent = title;
-            document.getElementById('message-body').innerHTML = body; 
+            document.getElementById('message-body').innerHTML = body;
             modal.style.display = 'block';
-            modal.style.zIndex = '10000'; 
+            modal.style.zIndex = '10000';
         }
 
         function closeMessageModal() {
             document.getElementById('message-modal').style.display = 'none';
         }
 
-        // --- Toggle Menu Functions ---
         function toggleMenu() {
             const menu = document.getElementById('settings-menu');
             const overlay = document.getElementById('menu-overlay');
@@ -1199,53 +1202,48 @@
             }
         }
 
-
         function formatMarkdown(text, allFiles) {
             const usedImages = new Set();
             if (!text) return { html: "", usedImages };
             
             const embeds = [];
-            const shortcodeRegex = /\[(image):\s*([^\]]+)\]/gi; 
-            
-            let processedText = text.replace(shortcodeRegex, (match, type, filename) => {
-                const trimmedFilename = filename.trim();
-                usedImages.add(trimmedFilename);
-                const fileItem = allFiles.find(f => f.Name === trimmedFilename);
-                
-                let html = "";
-                if (fileItem) {
-                    html = buildImageEmbed(fileItem);
-                } else {
-                    html = `<p style="color:red; font-weight:bold;">[File not found: ${trimmedFilename}]</p>`;
+            const shortcodeRegex = /\[(image):\s*([^\]]+)\]/gi;
+
+            let formattedText = text.replace(shortcodeRegex, (match, type, filename) => {
+                const cleanName = filename.trim();
+                const fileObj = allFiles.find(f => f.Name === cleanName);
+                if (fileObj) {
+                    usedImages.add(fileObj.Name);
+                    const embedHtml = createMediaEmbed(fileObj);
+                    embeds.push(embedHtml);
+                    return `__MEDIA_EMBED_${embeds.length - 1}__`;
                 }
-                embeds.push(html);
-                return `<!--EMBED_${embeds.length - 1}-->`;
+                return `(File not found: ${cleanName})`;
             });
 
-            let markdownHtml = marked.parse(processedText, { breaks: true });
+            // Convert Markdown to HTML
+            let html = marked.parse(formattedText, { breaks: true });
 
-            for (let i = embeds.length - 1; i >= 0; i--) {
-                const token = `<!--EMBED_${i}-->`;
-                markdownHtml = markdownHtml.replace(new RegExp(`<p>${token}</p>`, 'g'), embeds[i]);
-                markdownHtml = markdownHtml.replace(new RegExp(token, 'g'), embeds[i]);
-            }
-            return { html: markdownHtml, usedImages };
+            // Re-inject media embeds
+            embeds.forEach((embed, index) => {
+                html = html.replace(`<p>__MEDIA_EMBED_${index}__</p>`, embed);
+                html = html.replace(`__MEDIA_EMBED_${index}__`, embed);
+            });
+
+            return { html, usedImages };
         }
-        
-        // buildImageEmbed with updated encoding/decoding for caption
-        function buildImageEmbed(item) {
+
+        function createMediaEmbed(item) {
             const placeholderText = 'Please log in to%0ASharePoint%0Ato view image';
             const placeholderUrl = `https://placehold.co/600x400/f4f8fb/777?text=${placeholderText}`;
             const onErrorScript = `this.src='${placeholderUrl}'; this.onerror=null;`;
+
             let caption = item.EvidenceDescription ? item.EvidenceDescription : item.Name;
             const captionHtml = marked.parse(caption, { breaks: true });
             
-            // 1. Escape single quotes for the URL parameter in the JS call
             const safeUrl = item.Link.replace(/'/g, "\\'");
-            // 2. Encode the HTML caption safely
             const encodedCaption = encodeURIComponent(captionHtml);
 
-            // 3. The inline onclick calls decodeURIComponent()
             return `
                 <div class="embedded-media-container" onclick="openModal('${safeUrl}', decodeURIComponent('${encodedCaption}'))">
                     <img src="${item.Link}" alt="${item.Name}" class="embedded-media-img" onerror="${onErrorScript}">
@@ -1265,45 +1263,41 @@
         function buildHtmlList(items, itemType, allFiles) {
             let html = "";
             const usedImages = new Set();
-            // Check if items exist and are not just empty strings
-            if (!items || items.length === 0) return { html: "", usedImages }; 
-            
-            let hasContent = false;
+            if (!items || items.length === 0) return { html: "", usedImages };
 
+            let hasContent = false;
             switch (itemType) {
                 case 'quant-box':
-                    items.forEach(item => { 
-                        if(item && item.trim() !== "") {
+                    items.forEach(item => {
+                        if (item && item.trim() !== "") {
                             html += `<div class="quant-box">${item}</div>`;
                             hasContent = true;
                         }
                     });
                     break;
-                case 'impact-box': 
-                     items.forEach(item => { 
-                        if(item && item.trim() !== "") {
-                            html += `<div class="quant-box impact-box">${item}</div>`; 
+                case 'impact-box':
+                    items.forEach(item => {
+                        if (item && item.trim() !== "") {
+                            html += `<div class="quant-box impact-box">${item}</div>`;
                             hasContent = true;
                         }
                     });
                     break;
                 case 'speech-bubble':
                     items.forEach(item => {
-                        if(item && item.trim() !== "") {
+                        if (item && item.trim() !== "") {
                             const result = formatMarkdown(item, allFiles);
-                            html += `<div class="speech-bubble">${result.html}</div>`; 
+                            html += `<div class="speech-bubble">${result.html}</div>`;
                             result.usedImages.forEach(img => usedImages.add(img));
                             hasContent = true;
                         }
                     });
                     break;
             }
-            
             if (!hasContent) html = "";
-            
             return { html, usedImages };
         }
-        
+
         function setTextOrHide(element, text) {
             if (element) {
                 if (text && text.trim() !== "") {
@@ -1314,32 +1308,20 @@
                 }
             }
         }
-        
-        function formatAndSetText(elementId, text, allFiles) {
-            const element = document.getElementById(elementId);
-            if (element) {
-                const result = formatMarkdown(text, allFiles);
-                element.innerHTML = result.html;
-                return result.usedImages;
-            }
-            return new Set();
+
+        function formatAndSetText(elementId, textData, allFiles) {
+            const el = document.getElementById(elementId);
+            if (!el) return new Set();
+            const result = formatMarkdown(textData, allFiles);
+            el.innerHTML = result.html;
+            return result.usedImages;
         }
 
-        // --- NEW: Populate initial data for table ---
-        function populateEvidenceTableData(packTitle, allFiles, usedImages) {
-             const matchingFiles = allFiles.filter(file => 
-            (file["Evidence Pack Name"] || "").split(/[;,]\s*/).includes(packTitle) &&
-                (!file.ItemType || file.ItemType.toLowerCase() !== 'folder') &&
-                (file.QIs && file.QIs.trim() !== '') 
-            );
 
-            // Filter out files that are already displayed in the visual section (usedImages)
-            currentTableFiles = matchingFiles.filter(file => !usedImages.has(file.Name));
-            
-            renderEvidenceTable(currentTableFiles);
-        }
+        // =========================================
+        // 3. TABLE & FILTER LOGIC
+        // =========================================
 
-        // --- NEW: Render table from provided list (for search/sort) ---
         function renderEvidenceTable(fileList) {
             const tableBody = document.getElementById('pack-evidence-table-body');
             if (!tableBody) return;
@@ -1353,27 +1335,25 @@
             fileList.forEach(item => {
                 let qiHtml = 'N/A';
                 if (item.QIs) {
-                    const qis = item.QIs.split(';').map(qi => qi.replace(/#/g, '').trim()).filter(qi => qi); 
+                    const qis = item.QIs.split(';').map(qi => qi.replace(/#/g, '').trim()).filter(qi => qi);
                     if (qis.length > 0) {
                         qiHtml = qis.map(qi => {
-                            const qiCodeMatch = qi.match(/^([0-9.]+)/); 
+                            const qiCodeMatch = qi.match(/^([0-9.]+)/);
                             const qiCode = qiCodeMatch ? qiCodeMatch[1] : qi;
-                            return `<span class="table-qi-label" title="${qi}">${qiCode}</span>`; 
+                            return `<span class="table-qi-label" title="${qi}">${qiCode}</span>`;
                         }).join(' ');
                     }
                 }
+
                 const cleanSessions = item.Session ? item.Session.replace(/#/g, '') : 'N/A';
-                // Using formatMarkdown for description in table too, but passing empty list for files 
-                // to avoid recursive image embedding within the table itself if descriptions contain shortcodes.
-                // Or pass 'allFiles' if you WANT images in the table descriptions. Let's pass allFiles.
-                const result = formatMarkdown(item.EvidenceDescription || 'N/A', files); 
+                const result = formatMarkdown(item.EvidenceDescription || 'N/A', files);
 
                 tableHtml += `
                     <tr>
                         <td><a href="${item.Link}" target="_blank">${item.Name}</a></td>
                         <td>${qiHtml}</td>
                         <td>${item.Tags || 'N/A'}</td>
-                        <td class="description-cell">${result.html}</td> 
+                        <td class="description-cell">${result.html}</td>
                         <td>${cleanSessions}</td>
                         <td>${item.Status || 'N/A'}</td>
                     </tr>
@@ -1381,16 +1361,14 @@
             });
             tableBody.innerHTML = tableHtml;
         }
-        
-        // --- NEW: Table Search Function ---
+
         function performTableSearch() {
             const searchInput = document.getElementById('searchInput');
-            if(!searchInput) return;
-            
+            if (!searchInput) return;
+
             const searchTerm = searchInput.value.toLowerCase();
-            
             const filtered = currentTableFiles.filter(item => {
-                 const matchesSearchTerm = (
+                const matchesSearchTerm = (
                     (item.Name && item.Name.toLowerCase().includes(searchTerm)) ||
                     (item.EvidenceDescription && item.EvidenceDescription.toLowerCase().includes(searchTerm)) ||
                     (item.Status && item.Status.toLowerCase().includes(searchTerm)) ||
@@ -1399,164 +1377,205 @@
                 );
                 return matchesSearchTerm;
             });
-            
-            // Re-sort the filtered results based on current sort state
+
             sortAndRender(filtered);
         }
-        
-        // --- NEW: Clear Table Filter ---
+
         function clearTableFilter() {
             const searchInput = document.getElementById('searchInput');
-            if(searchInput) searchInput.value = '';
+            if (searchInput) searchInput.value = '';
             performTableSearch();
         }
-        
-        // --- NEW: Sort Function ---
+
         function sortAndRender(dataToList) {
             const col = currentSort.column;
             const dir = currentSort.direction;
-            
-            dataToList.sort((a, b) => {
-                let valA = a[col] || '';
-                let valB = b[col] || '';
-                
-                // Clean hashes/formatting for sort if needed
-                if (col === 'QIs' || col === 'Session') {
-                    valA = valA.replace(/#/g, '');
-                    valB = valB.replace(/#/g, '');
-                }
 
-                return dir === 'asc' ? 
-                    valA.localeCompare(valB, undefined, {numeric: true, sensitivity: 'base'}) : 
-                    valB.localeCompare(valA, undefined, {numeric: true, sensitivity: 'base'});
+            dataToList.sort((a, b) => {
+                let valA = (a[col] || "").toString().toLowerCase();
+                let valB = (b[col] || "").toString().toLowerCase();
+                if (valA < valB) return dir === 'asc' ? -1 : 1;
+                if (valA > valB) return dir === 'asc' ? 1 : -1;
+                return 0;
             });
-            
+
             renderEvidenceTable(dataToList);
         }
-        
-        
-        // --- Visual Evidence Logic (Grid + Carousel + Print List) ---
-        function populateVisualEvidence(packTitle, allFiles, usedImages) {
-            const gridContainer = document.getElementById('visual-evidence-grid');
-            const carouselContainer = document.getElementById('carousel-slides-container');
-            const printListContainer = document.getElementById('visual-evidence-print-list'); 
+
+
+        // =========================================
+        // 4. VISUAL EVIDENCE LOGIC (Images & Video)
+        // =========================================
+
+        function buildVideoGallery(packTitle, allFiles) {
+            const container = document.getElementById('video-gallery');
+            const sidebar = document.getElementById('video-sidebar-list');
+            const mainVideoSrc = document.getElementById('main-video-source');
+            const mainVideoPlayer = document.getElementById('main-video-player');
+            const mainTitle = document.getElementById('main-video-title');
+            const mainDesc = document.getElementById('main-video-desc');
+
+            if (!container) return;
+
+            // Filter for MP4 files belonging to this pack
+            const videos = allFiles.filter(file => {
+                 const nameLower = file.Name.toLowerCase();
+                 const packNames = (file["Evidence Pack Name"] || "").split(/[;,]\s*/);
+                 return packNames.includes(packTitle) && nameLower.endsWith('.mp4');
+            });
+
+            if (videos.length === 0) {
+                container.style.display = 'none';
+                return;
+            }
+
+            // Store for access
+            currentVideos = videos;
+            container.style.display = 'flex';
+
+            // Load the first video by default
+            loadMainVideo(0);
+
+            // Build Sidebar
+            let sidebarHtml = "";
+            videos.forEach((video, index) => {
+                 const activeClass = (index === 0) ? 'active-video' : '';
+                 const desc = video.EvidenceDescription || "No description available";
+                 sidebarHtml += `
+                    <div class="video-sidebar-item ${activeClass}" id="video-item-${index}" onclick="loadMainVideo(${index})">
+                        <div class="video-sidebar-thumb">▶</div> 
+                        <div class="video-sidebar-text">
+                            <span class="video-sidebar-title">${video.Name}</span>
+                            <span class="video-sidebar-desc">${desc}</span>
+                        </div>
+                    </div>
+                 `;
+            });
+            sidebar.innerHTML = sidebarHtml;
+        }
+
+        // Global function for onclick events
+        window.loadMainVideo = function(index) {
+            const video = currentVideos[index];
+            const mainVideoSrc = document.getElementById('main-video-source');
+            const mainVideoPlayer = document.getElementById('main-video-player');
+            const mainTitle = document.getElementById('main-video-title');
+            const mainDesc = document.getElementById('main-video-desc');
+
+            if(!video) return;
+
+            mainVideoSrc.src = video.Link;
+            mainVideoPlayer.load(); // Reload video source
+            
+            mainTitle.textContent = video.Name;
+            mainDesc.textContent = video.EvidenceDescription || "";
+
+            // Update Active State in Sidebar
+            document.querySelectorAll('.video-sidebar-item').forEach(el => el.classList.remove('active-video'));
+            const activeItem = document.getElementById(`video-item-${index}`);
+            if(activeItem) activeItem.classList.add('active-video');
+        };
+
+        function buildVisualEvidenceSection(packTitle, allFiles, usedImages) {
             const section = document.getElementById('visual-evidence');
+            const gridContainer = document.getElementById('visual-evidence-grid');
+            const carouselSlides = document.getElementById('carousel-slides-container');
+            const printListContainer = document.getElementById('visual-evidence-print-list');
             const imageExtensions = ['.png', '.jpg', '.jpeg', '.gif', '.bmp', '.svg'];
 
             if (!gridContainer || !section || !printListContainer) return;
 
+            // Build Video Gallery First
+            buildVideoGallery(packTitle, allFiles);
+
+            // Filter for Images
             const matchingImages = allFiles.filter(file => {
                 const nameLower = file.Name.toLowerCase();
                 const isImage = imageExtensions.some(ext => nameLower.endsWith(ext));
                 const isUsed = usedImages.has(file.Name);
-                return (file["Evidence Pack Name"] || "").split(/[;,]\s*/).includes(packTitle) && isImage &&
+                return (file["Evidence Pack Name"] || "").split(/[;,]\s*/).includes(packTitle) &&
+                       isImage &&
                        (!file.ItemType || file.ItemType.toLowerCase() !== 'folder') &&
                        !isUsed;
             });
 
-            if (matchingImages.length === 0) {
-                section.style.display = 'none';
-                return new Set(); 
-            }
-            
-            section.style.display = 'block';
-            totalSlides = matchingImages.length;
+            // If no images AND no videos (checked by video func setting display none), hide section
+            const videoContainer = document.getElementById('video-gallery');
+            const hasVideos = videoContainer && videoContainer.style.display !== 'none';
 
+            if (matchingImages.length === 0 && !hasVideos) {
+                section.style.display = 'none';
+                return new Set();
+            }
+
+            section.style.display = 'block';
+            
+            // Generate Image HTML
+            totalSlides = matchingImages.length;
             let gridHtml = "";
             let carouselHtml = "";
             let printHtml = "";
-            
+
             const placeholderText = 'Please log in to%0ASharePoint%0Ato view image';
             const placeholderUrl = `https://placehold.co/600x400/f4f8fb/777?text=${placeholderText}`;
             const onErrorScript = `this.src='${placeholderUrl}'; this.onerror=null;`;
 
             const visualSectionImages = new Set();
 
-            matchingImages.forEach((item, idx) => {
-                visualSectionImages.add(item.Name);
+            if (matchingImages.length > 0) {
+                matchingImages.forEach((item, idx) => {
+                    visualSectionImages.add(item.Name);
+                    
+                    const safeUrl = item.Link.replace(/'/g, "\\'");
+                    let caption = item.EvidenceDescription ? item.EvidenceDescription : item.Name;
+                    const captionHtml = marked.parse(caption, { breaks: true });
+                    const encodedCaption = encodeURIComponent(captionHtml);
 
-                // Escape strings
-                const safeUrl = item.Link.replace(/'/g, "\\'");
-
-                let caption = item.EvidenceDescription ? item.EvidenceDescription : item.Name;
-                const captionHtml = marked.parse(caption, { breaks: true });
-                const encodedCaption = encodeURIComponent(captionHtml);
-
-
-                // Grid Item (Refactored to put click handler on image wrapper)
-                // 3. The inline onclick calls decodeURIComponent()
-                gridHtml += `
-                    <div class="visual-card">
-                        <div class="visual-card-image-wrapper" onclick="openModal('${safeUrl}', decodeURIComponent('${encodedCaption}'))">
-                            <img src="${item.Link}" alt="${item.Name}" class="visual-card-img" onerror="${onErrorScript}">
+                    // Grid Item
+                    gridHtml += `
+                        <div class="visual-card">
+                            <div class="visual-card-image-wrapper" onclick="openModal('${safeUrl}', decodeURIComponent('${encodedCaption}'))">
+                                 <img src="${item.Link}" alt="${item.Name}" class="visual-card-img" onerror="${onErrorScript}">
+                            </div>
+                            <span class="visual-card-title">${captionHtml}</span>
                         </div>
-                        <span class="visual-card-title">${captionHtml}</span>
-                    </div>
-                `;
-                
-                // Carousel Item (Updated to use the same click logic)
-                const activeClass = (idx === 0) ? 'active' : '';
-                carouselHtml += `
-                    <div class="carousel-slide ${activeClass}" data-index="${idx}">
-                        <div onclick="openModal('${safeUrl}', decodeURIComponent('${encodedCaption}'))" style="cursor: pointer;">
-                            <img src="${item.Link}" alt="${item.Name}" class="carousel-img" onerror="${onErrorScript}">
+                    `;
+
+                    // Carousel Item
+                    const activeClass = (idx === 0) ? 'active' : '';
+                    carouselHtml += `
+                        <div class="carousel-slide ${activeClass}" data-index="${idx}">
+                            <div onclick="openModal('${safeUrl}', decodeURIComponent('${encodedCaption}'))" style="cursor: pointer;">
+                                 <img src="${item.Link}" alt="${item.Name}" class="carousel-img" onerror="${onErrorScript}">
+                            </div>
+                            <div class="carousel-caption">${captionHtml}</div>
                         </div>
-                        <div class="carousel-caption">${captionHtml}</div>
-                    </div>
-                `;
-                
-                // Print List Item
-                printHtml += `
-                    <div class="print-media-item">
-                        <img src="${item.Link}" alt="${item.Name}" class="print-media-img" onerror="${onErrorScript}">
-                        <div class="print-media-caption">${captionHtml}</div>
-                    </div>
-                `;
-            });
-            
+                    `;
+
+                    // Print List Item
+                    printHtml += `
+                        <div class="print-media-item">
+                            <img src="${item.Link}" alt="${item.Name}" class="print-media-img" onerror="${onErrorScript}">
+                            <div class="print-media-caption">${captionHtml}</div>
+                        </div>
+                    `;
+                });
+            } else {
+                gridHtml = "<p>No images found.</p>";
+                carouselHtml = "<p>No images found.</p>";
+            }
+
             gridContainer.innerHTML = gridHtml;
-            carouselContainer.innerHTML = carouselHtml;
-            printListContainer.innerHTML = printHtml; 
+            carouselSlides.innerHTML = carouselHtml;
+            printListContainer.innerHTML = printHtml;
+
+            // Reset view to Grid
+            switchView('grid');
+            currentSlideIndex = 0;
             updateCarouselUI();
 
             return visualSectionImages;
         }
-
-        // --- MODAL FUNCTIONS ---
-        // Caption now receives correctly decoded HTML string
-        function openModal(url, caption) {
-            const modal = document.getElementById('image-modal');
-            const modalImg = document.getElementById('modal-image');
-            const modalCaption = document.getElementById('modal-caption');
-            
-            modal.style.display = "block";
-            modalImg.src = url;
-            
-            // Apply error handling to modal image too
-            const placeholderText = 'Please log in to%0ASharePoint%0Ato view image';
-            const placeholderUrl = `https://placehold.co/800x600/f4f8fb/777?text=${placeholderText}`;
-            modalImg.onerror = function() { this.src = placeholderUrl; this.onerror = null; };
-            
-            modalCaption.innerHTML = caption;
-        }
-
-        function closeModal() {
-            document.getElementById('image-modal').style.display = "none";
-        }
-        
-        // Close modal if clicking outside image
-        window.onclick = function(event) {
-            const modal = document.getElementById('image-modal');
-            const msgModal = document.getElementById('message-modal');
-            if (event.target == modal) {
-                modal.style.display = "none";
-            }
-            if (event.target == msgModal) {
-                closeMessageModal();
-            }
-        }
-
-        // --- UI INTERACTION FUNCTIONS ---
 
         function switchView(mode) {
             const grid = document.getElementById('visual-evidence-grid');
@@ -1580,42 +1599,64 @@
         function moveCarousel(direction) {
             const slides = document.querySelectorAll('.carousel-slide');
             if (slides.length === 0) return;
-            
-            // Hide current
+
             slides[currentSlideIndex].classList.remove('active');
-            
-            // Calculate new index
             currentSlideIndex += direction;
             if (currentSlideIndex < 0) currentSlideIndex = totalSlides - 1;
             if (currentSlideIndex >= totalSlides) currentSlideIndex = 0;
-            
-            // Show new
             slides[currentSlideIndex].classList.add('active');
             updateCarouselUI();
         }
-        
+
         function updateCarouselUI() {
             const counter = document.getElementById('carousel-counter');
-            if(counter) counter.textContent = `${currentSlideIndex + 1} of ${totalSlides}`;
+            if (counter) counter.textContent = `${currentSlideIndex + 1} of ${totalSlides}`;
         }
-        
-        // --- NEW: Minimization Logic ---
+
+
+        // =========================================
+        // 5. MODAL LOGIC
+        // =========================================
+
+        function openModal(src, captionHtml) {
+            const modal = document.getElementById("image-modal");
+            const modalImg = document.getElementById("modal-img");
+            const captionText = document.getElementById("modal-caption");
+
+            modal.style.display = "block";
+            modalImg.src = src;
+            
+            // Standard error handling for modal image
+            modalImg.onerror = function() {
+                this.src = 'https://placehold.co/600x400/f4f8fb/777?text=Image+Load+Error';
+                this.onerror = null;
+            };
+
+            captionText.innerHTML = captionHtml;
+        }
+
+        function closeModal() {
+            document.getElementById("image-modal").style.display = "none";
+        }
+
+
+        // =========================================
+        // 6. UI INTERACTION (Comments, Print, Drag)
+        // =========================================
+
+        // --- Comment Box ---
         function toggleCommentBox() {
             const box = document.getElementById('comment-box');
             const tab = document.getElementById('restore-tab');
-            
             if (box.style.display !== 'none') {
-                // Minimize
                 box.style.display = 'none';
                 tab.style.display = 'block';
             } else {
-                // Restore
-                box.style.display = 'flex'; // Use flex to match comment-box CSS
+                box.style.display = 'flex';
                 tab.style.display = 'none';
             }
         }
 
-        // --- NEW: Custom Placeholder Logic ---
         const prompts = [
             "I don't understand...",
             "There should be more about...",
@@ -1629,7 +1670,7 @@
             if (textarea.value.trim() === '' || prompts.includes(textarea.value.trim())) {
                 const randomPrompt = prompts[Math.floor(Math.random() * prompts.length)];
                 textarea.value = randomPrompt;
-                textarea.classList.add('placeholder-text'); 
+                textarea.classList.add('placeholder-text');
             }
         }
 
@@ -1646,189 +1687,42 @@
             }
         }
 
-        // Expose functions globally for HTML attributes
-        window.toggleCommentBox = toggleCommentBox;
-        window.handleFocus = handleFocus;
-        window.handleBlur = handleBlur;
-
-        // --- Comment Submission Logic (UPDATED) ---
         function submitComment() {
             const commentInput = document.getElementById('comment-input');
-            const comment = commentInput.value.trim();
-            
-            // Check if the current text is one of the placeholders
-            const isPlaceholder = prompts.includes(comment);
-
-            if (!comment || isPlaceholder) {
-                showMessageModal("Submission Failed", "Please enter a specific comment before submitting.");
+            const comment = commentInput.value;
+            if (comment.trim() === "" || commentInput.classList.contains('placeholder-text')) {
+                showMessageModal("Empty Comment", "Please enter some feedback before submitting.");
                 return;
             }
 
-            const submissionId = currentPackIndex;
-            const submissionPackName = currentPackTitle;
-            
-            // Encode parameters
-            const encComment = encodeURIComponent(comment);
-            const encName = encodeURIComponent(submissionPackName);
-
-            // LIVE GOOGLE SCRIPT URL
-            const GOOGLE_FORM_URL = "https://script.google.com/macros/s/AKfycbyxQ2fjQxgxsc7cs4a1IhbMFGB5O8WxbzuUOR_Cc7WKuzaONBnzYa-Sc-WfIAxqg4/exec";
-            
-            // Construct the final URL with 3 GET parameters: id, comment, evidencePackName
-            const fullUrl = `${GOOGLE_FORM_URL}?id=${submissionId}&comment=${encComment}&evidencePackName=${encName}`;
-
-            // Update button state
+            const googleFormUrl = "https://script.google.com/macros/s/AKfycbz1-2-3-DEMO-URL/exec";
+            const fullUrl = `${googleFormUrl}?pack=${encodeURIComponent(currentPackTitle)}&comment=${encodeURIComponent(comment)}`;
             const submitBtn = document.getElementById('submit-comment-btn');
+
             submitBtn.textContent = 'Submitting...';
             submitBtn.disabled = true;
 
-            fetch(fullUrl, {
-                method: 'GET',
-                // Use 'no-cors' for cross-domain forms/scripts (like Google Apps Script)
-                mode: 'no-cors' 
-            })
-            .then(() => {
-                // Since we use 'no-cors', we rely on the fetch succeeding rather than parsing the response.
-                showMessageModal("Success", `Your feedback has been submitted successfully!`);
-                commentInput.value = ''; 
-                setRandomPlaceholder(commentInput); // Re-apply placeholder
-            })
-            .catch(error => {
-                console.error('Submission error:', error);
-                showMessageModal("Error", "Could not submit feedback. There was a network or server issue.");
-            })
-            .finally(() => {
-                // Restore button state
-                submitBtn.textContent = 'Submit Feedback';
-                submitBtn.disabled = false;
-            });
-        }
-        window.submitComment = submitComment;
-
-        // --- NEW: Function to change pack via selector ---
-        // NOTE: Keeping this if needed, though menu list is preferred now
-        function changePack(index) {
-            window.location.search = `?index=${index}`;
-        }
-        window.changePack = changePack; // Expose global
-
-        // --- NEW: Function to print all packs ---
-        function printAllPacks() {
-            const bulkContainer = document.getElementById('bulk-print-container');
-            const singlePackContent = document.querySelector('.single-pack-content');
-            
-            // Prepare for bulk printing
-            document.body.classList.add('bulk-printing');
-            bulkContainer.innerHTML = ''; // Clear previous content
-
-            // Iterate over all packs and build their HTML
-            packs.forEach(pack => {
-                const packDiv = document.createElement('div');
-                packDiv.className = 'bulk-print-page-break';
-                
-                // Get all images used in this pack's text (for filtering)
-                const allUsedImages = new Set();
-                const whatRes = formatMarkdown(pack.what_text, files);
-                whatRes.usedImages.forEach(i => allUsedImages.add(i));
-                const soWhatRes = formatMarkdown(pack.so_what_text, files);
-                soWhatRes.usedImages.forEach(i => allUsedImages.add(i));
-                const qualRes = buildHtmlList(pack.qualitative_summary, 'speech-bubble', files);
-                qualRes.usedImages.forEach(i => allUsedImages.add(i));
-                const whatNowRes = formatMarkdown(pack.what_now_steps, files);
-                whatNowRes.usedImages.forEach(i => allUsedImages.add(i));
-                
-                // Build HTML content for this pack
-                // We'll reuse the helper functions but return strings instead of setting innerHTML
-                
-                // Header
-                let html = `<h1>${pack.title}</h1>`;
-                html += `
-                    <div class="pack-meta">
-                        <div class="qi-labels">
-                            <span class="qi-label qi-primary">${pack.primary_qi}</span>
-                            <span class="qi-label qi-secondary">${pack.secondary_qi || ''}</span>
-                        </div>
-                        <div class="impact-score">
-                            <strong>Self-Evaluation: ${pack.hgios_score} - ${hgiosText[pack.hgios_score]}</strong>
-                            <div class="impact-meter">${buildHgiosMeter(pack.hgios_score)}</div>
-                        </div>
-                    </div>
-                `;
-                
-                // What Section
-                html += `<section><h2>What: Our Practice & Evidence</h2>`;
-                html += `<div class="text-content">${whatRes.html}</div>`;
-                html += `<h3>Participation Summary</h3><div class="quant-grid">${buildHtmlList(pack.participation_summary, 'quant-box', files).html}</div></section>`;
-                
-                // So What Section
-                html += `<section><h2>So What: The Impact & Outcomes</h2>`;
-                html += `<div class="text-content">${soWhatRes.html}</div>`;
-                html += `<h3>Quantitative Summary (Impact)</h3><div class="quant-grid">${buildHtmlList(pack.impact_summary, 'impact-box').html}</div>`;
-                html += `<h3>Qualitative Summary</h3><div class="qual-container">${qualRes.html}</div></section>`;
-                
-                // What Now Section
-                html += `<section><h2>What Now: The Next Steps</h2>`;
-                html += `<div class="text-content">${whatNowRes.html}</div></section>`;
-                
-                // Visual Evidence (List only for print)
-                // We need to replicate the visual evidence logic here for the print list
-                // Find matching images
-                 const imageExtensions = ['.png', '.jpg', '.jpeg', '.gif', '.bmp', '.svg'];
-                 const matchingImages = files.filter(file => {
-                    const nameLower = file.Name.toLowerCase();
-                    const isImage = imageExtensions.some(ext => nameLower.endsWith(ext));
-                    const isUsed = allUsedImages.has(file.Name);
-                    return (file["Evidence Pack Name"] || "").split(/[;,]\s*/).includes(pack.title) && isImage &&
-                           (!file.ItemType || file.ItemType.toLowerCase() !== 'folder') &&
-                           !isUsed;
+            fetch(fullUrl, { method: 'GET', mode: 'no-cors' })
+                .then(() => {
+                    showMessageModal("Success", `Your feedback has been submitted successfully!`);
+                    commentInput.value = '';
+                    setRandomPlaceholder(commentInput);
+                })
+                .catch(error => {
+                    console.error('Submission error:', error);
+                    showMessageModal("Error", "Could not submit feedback. There was a network or server issue.");
+                })
+                .finally(() => {
+                    submitBtn.textContent = 'Submit Feedback';
+                    submitBtn.disabled = false;
                 });
-                
-                if (matchingImages.length > 0) {
-                     html += `<section><h2>Visual Evidence</h2>`;
-                     matchingImages.forEach(item => {
-                         let caption = item.EvidenceDescription ? item.EvidenceDescription : item.Name;
-                         const captionHtml = marked.parse(caption, { breaks: true });
-                         const placeholderText = 'Please log in to%0ASharePoint%0Ato view image';
-                         const placeholderUrl = `https://placehold.co/600x400/f4f8fb/777?text=${placeholderText}`;
-                         const onErrorScript = `this.src='${placeholderUrl}'; this.onerror=null;`;
-                         
-                         html += `
-                            <div class="print-media-item">
-                                <img src="${item.Link}" alt="${item.Name}" class="print-media-img" onerror="${onErrorScript}">
-                                <div class="print-media-caption">${captionHtml}</div>
-                            </div>
-                        `;
-                     });
-                     html += `</section>`;
-                }
-
-                packDiv.innerHTML = html;
-                bulkContainer.appendChild(packDiv);
-            });
-
-            // Trigger print
-            window.print();
-            
-            // Clean up after print dialog closes (or user cancels)
-            // Note: window.print() blocks execution in many browsers, but not all. 
-            // A timeout or event listener (afterprint) is safer for cleanup.
-            window.onafterprint = function() {
-                 document.body.classList.remove('bulk-printing');
-                 bulkContainer.innerHTML = ''; // Clear memory
-                 window.onafterprint = null; // Remove listener
-            };
-            
-            // Fallback for browsers that don't block
-             setTimeout(() => {
-                 // We rely on CSS to hide things, so we don't strictly need to clear innerHTML immediately if the user is slow.
-                 // But cleaning up the class is important if they cancel.
-                 // Ideally, rely on onafterprint. If browser doesn't support it well, user might see bulk list briefly.
-             }, 1000);
         }
-        window.printAllPacks = printAllPacks;
 
+        // --- Draggable Logic ---
         function setupDraggableCommentBox() {
-            const dragItem = document.getElementById('comment-box');
+            const dragItem = document.getElementById("comment-box");
+            const container = document.body;
+
             let active = false;
             let currentX;
             let currentY;
@@ -1837,34 +1731,26 @@
             let xOffset = 0;
             let yOffset = 0;
 
-            const dragHandle = dragItem.querySelector('h3');
-            if (!dragHandle) return;
-
-            dragHandle.addEventListener("touchstart", dragStart, false);
-            dragHandle.addEventListener("touchend", dragEnd, false);
-            dragHandle.addEventListener("touchmove", drag, false);
-
-            dragHandle.addEventListener("mousedown", dragStart, false);
-            document.addEventListener("mouseup", dragEnd, false);
-            document.addEventListener("mousemove", drag, false);
-
-            function getCoords(e) {
-                if (e.touches) return { clientX: e.touches[0].clientX, clientY: e.touches[0].clientY };
-                return { clientX: e.clientX, clientY: e.clientY };
-            }
+            container.addEventListener("touchstart", dragStart, false);
+            container.addEventListener("touchend", dragEnd, false);
+            container.addEventListener("touchmove", drag, false);
+            container.addEventListener("mousedown", dragStart, false);
+            container.addEventListener("mouseup", dragEnd, false);
+            container.addEventListener("mousemove", drag, false);
 
             function dragStart(e) {
-                if (e.target.tagName === 'BUTTON' || e.target.tagName === 'TEXTAREA') {
-                    return;
+                if (e.target.tagName === 'H3' && e.target.parentElement === dragItem) {
+                    if (e.type === "touchstart") {
+                        initialX = e.touches[0].clientX - xOffset;
+                        initialY = e.touches[0].clientY - yOffset;
+                    } else {
+                        initialX = e.clientX - xOffset;
+                        initialY = e.clientY - yOffset;
+                    }
+                    if (e.target === dragItem.querySelector('h3')) {
+                        active = true;
+                    }
                 }
-                
-                const { clientX, clientY } = getCoords(e);
-
-                initialX = clientX - xOffset;
-                initialY = clientY - yOffset;
-                
-                active = true;
-                e.preventDefault();
             }
 
             function dragEnd(e) {
@@ -1878,15 +1764,15 @@
             function drag(e) {
                 if (active) {
                     e.preventDefault();
-                    
-                    const { clientX, clientY } = getCoords(e);
-
-                    currentX = clientX - initialX;
-                    currentY = clientY - initialY;
-
+                    if (e.type === "touchmove") {
+                        currentX = e.touches[0].clientX - initialX;
+                        currentY = e.touches[0].clientY - initialY;
+                    } else {
+                        currentX = e.clientX - initialX;
+                        currentY = e.clientY - initialY;
+                    }
                     xOffset = currentX;
                     yOffset = currentY;
-
                     setTranslate(currentX, currentY, dragItem);
                 }
             }
@@ -1896,42 +1782,157 @@
             }
         }
 
+        // --- Change Pack ---
+        function changePack(index) {
+            window.location.search = `?index=${index}`;
+        }
 
-        // --- MAIN LOAD FUNCTION (Update) ---
+        // --- Bulk Print ---
+        function printAllPacks() {
+            const bulkContainer = document.getElementById('bulk-print-container');
+            const singlePackContent = document.querySelector('.single-pack-content');
+
+            document.body.classList.add('bulk-printing');
+            bulkContainer.innerHTML = '';
+
+            packs.forEach(pack => {
+                const packDiv = document.createElement('div');
+                packDiv.className = 'bulk-print-page-break';
+
+                const allUsedImages = new Set();
+                const whatRes = formatMarkdown(pack.what_text, files);
+                whatRes.usedImages.forEach(i => allUsedImages.add(i));
+                const soWhatRes = formatMarkdown(pack.so_what_text, files);
+                soWhatRes.usedImages.forEach(i => allUsedImages.add(i));
+                const qualRes = buildHtmlList(pack.qualitative_summary, 'speech-bubble', files);
+                qualRes.usedImages.forEach(i => allUsedImages.add(i));
+                const whatNowRes = formatMarkdown(pack.what_now_steps, files);
+                whatNowRes.usedImages.forEach(i => allUsedImages.add(i));
+
+                let html = `<h1>${pack.title}</h1>`;
+                
+                // Meta
+                html += `<div class="pack-meta"><div class="qi-labels">`;
+                if (pack.primary_qi) {
+                     pack.primary_qi.split(';').forEach(qi => { html += `<span class="qi-label qi-primary">${qi.trim()}</span>`; });
+                }
+                if (pack.secondary_qi) {
+                     pack.secondary_qi.split(';').forEach(qi => { html += `<span class="qi-label qi-secondary">${qi.trim()}</span>`; });
+                }
+                html += `</div>`;
+                const score = parseInt(pack.hgios_score, 10) || 0;
+                if(score > 0) {
+                     html += `<div class="impact-score"><strong>Impact Score: ${hgiosText[score]}</strong><div class="impact-meter">${buildHgiosMeter(score)}</div></div>`;
+                }
+                html += `</div>`;
+
+                // Sections
+                html += `<section><h2>What</h2><div class="text-content">${whatRes.html}</div>`;
+                const partRes = buildHtmlList(pack.participation_summary, 'quant-box', files);
+                if(partRes.html) html += `<h3>Participation</h3><div class="quant-grid">${partRes.html}</div>`;
+                html += `</section>`;
+
+                html += `<section><h2>So What</h2><div class="text-content">${soWhatRes.html}</div>`;
+                const impRes = buildHtmlList(pack.impact_summary, 'impact-box', files);
+                if(impRes.html) html += `<h3>Quantitative Impact</h3><div class="quant-grid">${impRes.html}</div>`;
+                if(qualRes.html) html += `<h3>Qualitative Summary</h3><div class="qual-container">${qualRes.html}</div>`;
+                html += `</section>`;
+
+                html += `<section><h2>What Now</h2><div class="text-content">${whatNowRes.html}</div></section>`;
+
+                // Visual Evidence Logic for Bulk Print
+                const imageExtensions = ['.png', '.jpg', '.jpeg', '.gif', '.bmp', '.svg'];
+                const matchingImages = files.filter(file => {
+                    const nameLower = file.Name.toLowerCase();
+                    const isImage = imageExtensions.some(ext => nameLower.endsWith(ext));
+                    const isUsed = allUsedImages.has(file.Name);
+                    return (file["Evidence Pack Name"] || "").split(/[;,]\s*/).includes(pack.title) &&
+                           isImage &&
+                           (!file.ItemType || file.ItemType.toLowerCase() !== 'folder') &&
+                           !isUsed;
+                });
+
+                if (matchingImages.length > 0) {
+                    html += `<section><h2>Visual Evidence</h2>`;
+                    matchingImages.forEach(item => {
+                         let caption = item.EvidenceDescription ? item.EvidenceDescription : item.Name;
+                         const captionHtml = marked.parse(caption, { breaks: true });
+                         const placeholderText = 'Please log in to%0ASharePoint%0Ato view image';
+                         const placeholderUrl = `https://placehold.co/600x400/f4f8fb/777?text=${placeholderText}`;
+                         const onErrorScript = `this.src='${placeholderUrl}'; this.onerror=null;`;
+                         html += `
+                            <div class="print-media-item">
+                                <img src="${item.Link}" alt="${item.Name}" class="print-media-img" onerror="${onErrorScript}">
+                                <div class="print-media-caption">${captionHtml}</div>
+                            </div>
+                         `;
+                    });
+                    html += `</section>`;
+                }
+
+                packDiv.innerHTML = html;
+                bulkContainer.appendChild(packDiv);
+            });
+
+            window.print();
+
+            window.onafterprint = function() {
+                document.body.classList.remove('bulk-printing');
+                bulkContainer.innerHTML = '';
+                window.onafterprint = null;
+            };
+
+            // Fallback
+            setTimeout(() => {}, 1000);
+        }
+
+        // Expose to window for inline HTML calls
+        window.toggleCommentBox = toggleCommentBox;
+        window.handleFocus = handleFocus;
+        window.handleBlur = handleBlur;
+        window.submitComment = submitComment;
+        window.changePack = changePack;
+        window.printAllPacks = printAllPacks;
+
+
+        // =========================================
+        // 7. MAIN INITIALIZATION (window.onload)
+        // =========================================
+
         window.onload = function() {
-            
             // --- 1. Get Index and Store Globally ---
             let index = 0;
             try {
                 const urlParams = new URLSearchParams(window.location.search);
-                // Index is the second parameter, defaulting to 1 if not present
                 let rawIndex = urlParams.get('index');
                 if (rawIndex === null) {
-                    // Fallback to the first pack if 'index' is not in URL
-                    index = packs.length > 0 ? packs[0].id : 1; 
+                    index = packs.length > 0 ? packs[0].id : 1;
                 } else {
                     index = parseInt(rawIndex, 10);
                 }
-            } catch (e) { index = 1; }
-            
-            currentPackIndex = index; // Store globally
-            
-            // Initialize drag functionality and set initial placeholder
-            setupDraggableCommentBox(); 
+            } catch (e) {
+                index = 1;
+            }
+            currentPackIndex = index;
+
+            setupDraggableCommentBox();
             setRandomPlaceholder(document.getElementById('comment-input'));
 
             // --- 2. Load Pack Data ---
-            let packData; 
+            let packData;
             if (packs.length > 0) {
-                 packData = packs.find(p => p.id === index) || packs[0];
+                packData = packs.find(p => p.id === index) || packs[0];
             } else {
                 const banner = document.getElementById('error-banner');
-                if (banner) { banner.style.display = 'block'; banner.textContent = "No Evidence Pack Data Found."; }
+                if (banner) {
+                    banner.style.display = 'block';
+                    banner.textContent = "No Evidence Pack Data Found.";
+                }
                 return;
             }
 
             try {
-                currentPackTitle = packData.title; // Store globally for submission
+                currentPackTitle = packData.title;
 
                 // Populate Pack List in Menu
                 const menuList = document.getElementById('menu-pack-list');
@@ -1941,39 +1942,61 @@
                         const activeClass = (p.id === index) ? 'active' : '';
                         const score = parseInt(p.hgios_score, 10) || 0;
                         const scoreClass = score >= 1 && score <= 6 ? `menu-score-${score}` : 'menu-score-na';
-                        
+                        const scoreLabel = score >= 1 && score <= 6 ? hgiosText[score] : 'N/A';
+
                         menuHtml += `
-                            <a href="#" onclick="changePack(${p.id}); return false;" class="menu-pack-item ${scoreClass} ${activeClass}">
-                                <span class="menu-pack-qi">${p.primary_qi || ''}</span>
-                                ${p.title}
+                            <a href="?index=${p.id}" class="menu-pack-item ${activeClass} ${scoreClass}">
+                                <span class="menu-pack-qi">QIs: ${(p.primary_qi || "None")}</span>
+                                <div>${p.title}</div>
                             </a>
                         `;
                     });
                     menuList.innerHTML = menuHtml;
                 }
 
-                document.title = packData.title;
+                // Render Title & QIs
                 document.getElementById('pack-title').textContent = packData.title;
-                setTextOrHide(document.getElementById('primary-qi'), packData.primary_qi);
-                setTextOrHide(document.getElementById('secondary-qi'), packData.secondary_qi);
-                
-                const score = parseInt(packData.hgios_score, 10);
-                if (!isNaN(score)) {
-                    document.getElementById('hgios-rating-text').textContent = `Self-Evaluation: ${score} - ${hgiosText[score]}`;
-                    document.getElementById('hgios-meter').innerHTML = buildHgiosMeter(score);
+
+                const qiContainer = document.getElementById('pack-qis');
+                if (qiContainer) {
+                    let qiHtml = "";
+                    if (packData.primary_qi) {
+                        packData.primary_qi.split(';').forEach(qi => {
+                            qiHtml += `<span class="qi-label qi-primary">${qi.trim()}</span>`;
+                        });
+                    }
+                    if (packData.secondary_qi) {
+                        packData.secondary_qi.split(';').forEach(qi => {
+                            qiHtml += `<span class="qi-label qi-secondary">${qi.trim()}</span>`;
+                        });
+                    }
+                    qiContainer.innerHTML = qiHtml;
                 }
 
-                // --- Track used images ---
+                // Render Impact Score
+                const score = parseInt(packData.hgios_score, 10) || 0;
+                const scoreLabel = document.getElementById('impact-label');
+                const scoreMeter = document.getElementById('impact-meter');
+                if (score >= 1 && score <= 6) {
+                    scoreLabel.textContent = `Impact Score: ${hgiosText[score]}`;
+                    scoreLabel.style.color = "#333";
+                    scoreMeter.innerHTML = buildHgiosMeter(score);
+                } else {
+                    scoreLabel.textContent = "Impact Score: N/A";
+                    scoreLabel.style.color = "#999";
+                    scoreMeter.innerHTML = "";
+                }
+
+                // Track used images to avoid duplication in visual evidence
                 const allUsedImages = new Set();
 
+                // Render Text Sections
                 const whatRes = formatAndSetText('what-text', packData.what_text, files);
                 whatRes.forEach(i => allUsedImages.add(i));
-                
-                // --- PARTICIPATION SUMMARY LOGIC ---
+
                 const partResult = buildHtmlList(packData.participation_summary, 'quant-box', files);
                 const partGrid = document.getElementById('participation-grid');
                 const partHead = document.getElementById('participation-heading');
-
                 if (!partResult.html || partResult.html.trim() === "") {
                     partGrid.style.display = 'none';
                     if (partHead) partHead.style.display = 'none';
@@ -1985,12 +2008,10 @@
 
                 const soWhatRes = formatAndSetText('so-what-text', packData.so_what_text, files);
                 soWhatRes.forEach(i => allUsedImages.add(i));
-                
-                // --- UPDATED: IMPACT SUMMARY LOGIC ---
+
                 const impResult = buildHtmlList(packData.impact_summary, 'impact-box');
                 const impGrid = document.getElementById('impact-grid');
                 const impHead = document.getElementById('impact-heading');
-
                 if (!impResult.html || impResult.html.trim() === "") {
                     impGrid.style.display = 'none';
                     if (impHead) impHead.style.display = 'none';
@@ -1999,43 +2020,49 @@
                     impGrid.style.display = 'grid';
                     if (impHead) impHead.style.display = 'block';
                 }
-                
-                // --- UPDATED: QUALITATIVE SUMMARY LOGIC ---
+
                 const qualResult = buildHtmlList(packData.qualitative_summary, 'speech-bubble', files);
                 const qualContainer = document.getElementById('qualitative-bubbles');
                 const qualHead = document.getElementById('qualitative-heading');
-                
                 if (!qualResult.html || qualResult.html.trim() === "") {
                     qualContainer.style.display = 'none';
                     if (qualHead) qualHead.style.display = 'none';
                 } else {
                     qualContainer.innerHTML = qualResult.html;
-                    qualContainer.style.display = 'block';
+                    qualContainer.style.display = 'flex';
                     if (qualHead) qualHead.style.display = 'block';
                 }
-                
                 qualResult.usedImages.forEach(i => allUsedImages.add(i));
 
                 const whatNowRes = formatAndSetText('what-now-text', packData.what_now_steps, files);
                 whatNowRes.forEach(i => allUsedImages.add(i));
-                
-                // --- Populate Visual Evidence (returns images used in carousel) ---
-                const visualImages = populateVisualEvidence(packData.title, files, allUsedImages);
-                if (visualImages) {
-                    visualImages.forEach(i => allUsedImages.add(i));
-                }
-                
-                // --- Populate Table (passing updated usedImages set) ---
-                populateEvidenceTableData(packData.title, files, allUsedImages);
 
-                // Default to Grid View
-                switchView('grid');
+                // --- 3. Render Visual Evidence Section (Video & Images) ---
+                const visImages = buildVisualEvidenceSection(packData.title, files, allUsedImages);
+                if (visImages) visImages.forEach(i => allUsedImages.add(i)); 
+
+                // --- 4. Render Evidence Table ---
+                const packFiles = files.filter(file => {
+                    const packNames = (file["Evidence Pack Name"] || "").split(/[;,]\s*/);
+                    // Show in table if it belongs to pack AND isn't a folder
+                    return packNames.includes(packData.title) && (!file.ItemType || file.ItemType.toLowerCase() !== 'folder');
+                });
                 
-                // Set Up Sort Listeners (New)
+                currentTableFiles = packFiles; // Store for sorting/searching
+                sortAndRender(currentTableFiles);
+
+                // --- 5. Setup Table Search Listener ---
+                const searchInput = document.getElementById('searchInput');
+                const clearButton = document.getElementById('clearButton');
+                if (searchInput) searchInput.addEventListener('input', performTableSearch);
+                if (clearButton) clearButton.addEventListener('click', clearTableFilter);
+
+                // --- 6. Setup Table Sort Listeners ---
                 document.querySelectorAll('th[data-column]').forEach(th => {
                     th.addEventListener('click', () => {
                         const column = th.dataset.column;
                         
+                        // Reset other headers
                         document.querySelectorAll('th[data-column]').forEach(otherTh => {
                             if (otherTh !== th) {
                                 otherTh.classList.remove('sort-asc', 'sort-desc');
@@ -2052,24 +2079,17 @@
                         th.classList.toggle('sort-asc', currentSort.direction === 'asc');
                         th.classList.toggle('sort-desc', currentSort.direction === 'desc');
 
-                        sortAndRender(currentTableFiles); 
+                        sortAndRender(currentTableFiles);
                     });
+                    
+                    // Default sort indicator on Name
                     if (th.dataset.column === 'Name') {
                         th.classList.add('sort-asc');
                     }
                 });
 
-                // Set up search listener (New)
-                if(searchInput) {
-                    searchInput.addEventListener('input', performTableSearch);
-                }
-                if(clearButton) {
-                    clearButton.addEventListener('click', clearTableFilter);
-                }
-
-
             } catch (error) {
-                console.error("Error:", error);
+                console.error("Error rendering pack:", error);
             }
         };
     </script>
